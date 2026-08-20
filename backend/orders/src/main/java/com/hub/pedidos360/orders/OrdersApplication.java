@@ -1,13 +1,13 @@
-package com.hub.pedidos360;
+package com.hub.pedidos360.orders;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Pedidos360Application {
+public class OrdersApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Pedidos360Application.class, args);
+		SpringApplication.run(OrdersApplication.class, args);
 	}
 
 }

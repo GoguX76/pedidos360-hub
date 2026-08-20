@@ -1,10 +1,10 @@
-package com.hub.pedidos360;
+package com.hub.pedidos360.notifications;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Pedidos360ApplicationTests {
+class NotificationsApplicationTests {
 
 	@Test
 	void contextLoads() {

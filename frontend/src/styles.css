@@ -1,3 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
-@import 'tailwindcss';
+:root {
+  --color-bg: #221C1A;
+  --color-surface: #3A2E29;
+  --color-ember: #E8A33D;
+  --color-ember-hover: #C98A2C;
+  --color-text: #F5EDE4;
+  --color-text-muted: #A89A8C;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  font-family: 'Work Sans', sans-serif;
+}

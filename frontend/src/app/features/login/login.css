@@ -1,0 +1,104 @@
+.login {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.login__glow {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-ember) 0%, transparent 70%);
+  opacity: 0.18;
+  filter: blur(40px);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login__glow {
+    animation: none;
+  }
+}
+
+.login__card {
+  position: relative;
+  z-index: 1;
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  padding: 3rem 3.5rem;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.login__eyebrow {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ember);
+  margin: 0 0 0.5rem;
+}
+
+.login__title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 2.25rem;
+  color: var(--color-text);
+  margin: 0 0 2rem;
+}
+
+.login__button {
+  font-family: 'Work Sans', sans-serif;
+  padding: 0.85rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--color-ember);
+  color: var(--color-bg);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login__button:hover {
+  background-color: var(--color-ember-hover);
+}
+
+.login__button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+
+.login__message {
+  font-family: 'Work Sans', sans-serif;
+  color: var(--color-text);
+  font-size: 1.05rem;
+}
+
+.login__footnote {
+  margin-top: 2rem;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.login__button--secondary {
+  background-color: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-text-muted);
+  margin-top: 0.75rem;
+}
+
+.login__button--secondary:hover {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.18; }
+  50% { transform: scale(1.08); opacity: 0.26; }
+}

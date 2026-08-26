@@ -1,0 +1,21 @@
+<div class="login">
+  <div class="login__glow" aria-hidden="true"></div>
+
+  <div class="login__card">
+    <p class="login__eyebrow">Pedidos360</p>
+    <h1 class="login__title">Tu cocina, en vivo</h1>
+
+    @if (authService.authenticatedUser()) {
+      <p class="login__message">Ya tienes una sesión activa.</p>
+      <button class="login__button login__button--secondary" (click)="onLogoutClick()">
+        Cerrar sesión
+      </button>
+    } @else {
+      <button class="login__button" (click)="onLoginClick()">
+        Iniciar sesión
+      </button>
+    }
+
+    <p class="login__footnote">pedidos360cl.onmicrosoft.com</p>
+  </div>
+</div>

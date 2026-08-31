@@ -1,1 +1,22 @@
-<p>home works!</p>
+<div class="home">
+  <header class="home__header">
+    <p class="home__eyebrow">Pedidos360</p>
+    <h1 class="home__title">Bienvenido de vuelta</h1>
+  </header>
+
+  <section class="home__grid">
+    <app-nav-card
+      icon="🧾"
+      title="Pedidos"
+      description="Consulta y da seguimiento a los pedidos activos."
+      link="/pedidos"
+    />
+    <app-nav-card 
+    icon="👤" 
+    title="Perfil" 
+    description="Gestione su cuenta y preferencias."
+    link="/perfil"
+    />
+    <app-nav-card icon="🚪" title="Cerrar sesión" (cardClick)="onLogoutClick()" />
+  </section>
+</div>

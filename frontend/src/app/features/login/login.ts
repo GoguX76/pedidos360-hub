@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect,inject } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
-
+import { Router } from '@angular/router';
 /**
  * Pantalla de inicio de sesión. Muestra un botón que dispara el
  * flujo de login vía MSAL, o un mensaje de bienvenida si el
@@ -17,6 +17,15 @@ export class LoginComponent {
   // inject() nos permite pedirle a Angular el AuthService sin
   // necesidad de declararlo en un constructor.
   protected authService = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {
+    effect(() => {
+      if (this.authService.authenticatedUser()) {
+        this.router.navigate(['/home']);
+      }
+    });
+  }
 
   /**
    * Dispara el flujo de login redirigiendo a Microsoft.

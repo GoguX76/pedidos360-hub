@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { signal } from "@angular/core";
 import { MsalService } from "@azure/msal-angular";
 import { MsalBroadcastService } from "@azure/msal-angular";
-import { EventType } from "@azure/msal-browser";
+import { EventType,InteractionStatus } from "@azure/msal-browser";
 import { Subject, filter, takeUntil } from "rxjs";
 
 /**
@@ -43,6 +43,15 @@ export class AuthService implements OnDestroy {
         this.msalService.handleRedirectObservable()
         .pipe(takeUntil(this.destroy$))
         .subscribe();
+
+        this.msalBroadcastService.inProgress$
+            .pipe(
+                filter((status) => status === InteractionStatus.None),
+                takeUntil(this.destroy$)
+            )
+            .subscribe(() => {
+                this.authenticatedUser.set(this.msalService.instance.getAllAccounts().length > 0);
+            });
 
         this.msalBroadcastService.msalSubject$
             .pipe(

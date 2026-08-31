@@ -1,0 +1,14 @@
+@if (link && !disabled) {
+  <a class="nav-card" [routerLink]="link">
+    <span class="nav-card__icon">{{ icon }}</span>
+    <span class="nav-card__title">{{ title }}</span>
+    @if (description) { <span class="nav-card__description">{{ description }}</span> }
+  </a>
+} @else {
+  <button type="button" class="nav-card" [class.nav-card--disabled]="disabled" [disabled]="disabled" (click)="onClick()">
+    @if (disabled) { <span class="nav-card__badge">Próximamente</span> }
+    <span class="nav-card__icon">{{ icon }}</span>
+    <span class="nav-card__title">{{ title }}</span>
+    @if (description) { <span class="nav-card__description">{{ description }}</span> }
+  </button>
+}

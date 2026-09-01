@@ -33,7 +33,8 @@ export function MSALInstanceFactory(): IPublicClientApplication {
     auth: {
       clientId: '4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4', // Id. de aplicación (cliente)
       authority: 'https://login.microsoftonline.com/6a3978a5-1a22-4be4-bbb8-a7c6279c471e', // Id. del Inquilino (Tenant)
-      redirectUri: 'http://localhost:4200' // La URL debe COINCIDIR con la que usa Azure
+      redirectUri: 'http://localhost:4200', // La URL debe COINCIDIR con la que usa Azure
+      postLogoutRedirectUri: 'http://localhost:4200/login' // NUEVA línea: a dónde volver tras cerrar sesión
     },
     cache: {
       cacheLocation: BrowserCacheLocation.LocalStorage // El token sobrevive si recargas la página

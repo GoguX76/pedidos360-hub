@@ -1,1 +1,4 @@
 .vscode
+contexto-caso
+node_modules/
+backend/bin/

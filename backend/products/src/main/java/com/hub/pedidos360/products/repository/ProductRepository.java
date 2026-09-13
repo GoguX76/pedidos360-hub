@@ -18,5 +18,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * Solo los productos disponibles — útil para cuando orders-service
      * quiera mostrar el menú activo, sin productos agotados/dados de baja.
      */
-    List<Product> findByDisponibleTrue();
+    List<Product> findByAvailableTrue();
 }

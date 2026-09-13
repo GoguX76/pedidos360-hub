@@ -1,28 +1,29 @@
 package com.hub.pedidos360.products.dto;
 
-/**
- * Lo que el cliente envía al crear o actualizar un producto.
- * Separado del model porque el cliente no debería poder mandar
- * un "id" propio — ese lo genera la base de datos.
- */
+import jakarta.validation.constraints.*;
+import lombok.*;
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequest {
 
-    private String nombre;
-    private Double precio;
-    private boolean disponible;
+    @NotBlank(message = "El nombre es obligatorio")
+    private String name;
 
-    protected ProductRequest() {
-    }
+    private String description;
+    
+    @Positive(message = "El precio debe ser mayor a 0")
+    private BigDecimal price;
 
-    public String getNombre() {
-        return nombre;
-    }
+    @Min(value = 0, message = "El stock no puede ser negativp")
+    private Integer stock;
 
-    public Double getPrecio() {
-        return precio;
-    }
+    @NotBlank
+    private String category;
 
-    public boolean isDisponible() {
-        return disponible;
-    }
+    private boolean available;
+
+  
 }

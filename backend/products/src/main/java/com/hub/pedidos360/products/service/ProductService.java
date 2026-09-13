@@ -1,17 +1,12 @@
 package com.hub.pedidos360.products.service;
 
+import com.hub.pedidos360.products.dto.ProductRequest;
 import com.hub.pedidos360.products.model.Product;
 import com.hub.pedidos360.products.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Lógica de negocio del catálogo de productos. El controller no habla
- * directo con el repository — todo pasa por aquí, para que las reglas
- * de negocio (como qué pasa si no se encuentra un producto) vivan en
- * un solo lugar.
- */
 @Service
 public class ProductService {
 
@@ -21,41 +16,51 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    /** Todos los productos, disponibles o no (para el panel de administración). */
-    public List<Product> obtenerTodos() {
+    public List<Product> getAll() {
         return productRepository.findAll();
     }
 
-    /** Solo los productos disponibles (para mostrar en el menú al cliente). */
-    public List<Product> obtenerDisponibles() {
-        return productRepository.findByDisponibleTrue();
+    public List<Product> available() {
+        return productRepository.findByAvailableTrue();
     }
 
-    /**
-     * Busca un producto por id.
-     *
-     * @throws ProductNotFoundException si no existe, para que el
-     * controller pueda responder un 404 en vez de un error genérico.
-     */
-    public Product obtenerPorId(Long id) {
+    public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public Product crear(String nombre, Double precio, boolean disponible) {
-        Product product = new Product(nombre, precio, disponible);
+    public Product create(ProductRequest request) {
+        Product product = new Product();
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setStock(request.getStock());
+        product.setCategory(request.getCategory());
+        product.setAvailable(request.isAvailable());
+        return productRepository.save(product);
+}
+
+    public Product update(Long id, ProductRequest request) {
+        Product product = getById(id);
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setStock(request.getStock());
+        product.setCategory(request.getCategory());
+        product.setAvailable(request.isAvailable());
         return productRepository.save(product);
     }
 
-    public Product actualizar(Long id, String nombre, Double precio, boolean disponible) {
-        Product product = obtenerPorId(id);
-        product.setNombre(nombre);
-        product.setPrecio(precio);
-        product.setDisponible(disponible);
+    public Product decrementStock(Long id, int quantity) {
+        Product product = getById(id);
+        if (product.getStock() < quantity) {
+            throw new InsufficientStockException(product.getName(), product.getStock(), quantity);
+        }
+        product.setStock(product.getStock() - quantity);
         return productRepository.save(product);
     }
 
-    public void eliminar(Long id) {
+    public void delete(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException(id);
         }

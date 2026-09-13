@@ -1,64 +1,39 @@
 package com.hub.pedidos360.products.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import java.math.BigDecimal;
 
-/**
- * Representa un producto del catálogo (ej. un plato o bebida que se
- * puede pedir). Es una entidad de base de datos porque el catálogo
- * necesita persistir entre reinicios del servicio.
- */
 @Entity
 @Table(name = "products")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)
-    private String nombre;
+    private String name;
+
+    private String description;
+
+    @Positive(message = "El precio debe ser mayor a 0")
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    @Column(nullable = false)
+    private Integer stock;
+
+    @NotBlank(message = "La categoría es obligatoria")
+    @Column(nullable = false)
+    private String category;
 
     @Column(nullable = false)
-    private Double precio;
-
-    @Column(nullable = false)
-    private boolean disponible = true;
-
-    // JPA exige un constructor vacío.
-    protected Product() {
-    }
-
-    public Product(String nombre, Double precio, boolean disponible) {
-        this.nombre = nombre;
-        this.precio = precio;
-        this.disponible = disponible;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
-
-    public boolean isDisponible() {
-        return disponible;
-    }
-
-    public void setDisponible(boolean disponible) {
-        this.disponible = disponible;
-    }
+    private boolean available = true;
 }

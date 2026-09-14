@@ -44,7 +44,7 @@ public class OrderService {
             OrderItem item = new OrderItem();
             item.setProductName(itemRequest.getProductName());
             item.setQuantity(itemRequest.getQuantity());
-            item.setUnitPrice(BigDecimal.valueOf(itemRequest.getUnitPrice()));
+            item.setUnitPrice(itemRequest.getUnitPrice());
             item.setOrder(order);
 
             order.getItems().add(item);

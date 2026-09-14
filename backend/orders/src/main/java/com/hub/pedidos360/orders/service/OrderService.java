@@ -25,8 +25,8 @@ public class OrderService {
 
     /**
      * Crea el pedido del cliente, obteniendo los datos del modelo Order,
-     * haciendo el cálculo del total del pedido y parseando el JSON para
-     * asegurar seguridad y funcionalidad del método
+     * haciendo el cálculo del total del pedido y validando el tipo de despacho
+     * recibido para que solo sean valores permitidos
      */
     public OrderResponse create(OrderRequest request) {
         DispatchType dispatchType = parseDispatchType(request.getDispatchType());
@@ -108,6 +108,44 @@ public class OrderService {
     }
 
     /**
+     * Permite actualizar el estado de un pedido usando su ID, útil
+     * para darle a conocer al cliente si este está en preparación,
+     * listo o en reparto
+     */
+
+    public OrderResponse updateStatus(Long id, String newStatus) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new OrderNotFoundException(id));
+
+        OrderStatus status = parseOrderStatus(newStatus);
+        validateTransition(order.getStatus(), status);
+
+        order.setStatus(status);
+        Order saved = orderRepository.save(order);
+        return toResponse(saved);
+    }
+
+    /**
+     * Permite cancelar un pedido mediante su ID si este ya
+     * fue creado
+     */
+
+    public OrderResponse cancel(Long id) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalStateException(
+                "Solamente ordenes con estado CREATED pueden ser canceladas. "
+                + "Estado actual: " + order.getStatus());
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        Order saved = orderRepository.save(order);
+        return toResponse(saved);
+    }
+
+    /**
      * Lanza error cuando el valor de tipo de despacho no corresponde
      * a los especificados, validando que sólo sean DELIVERY (Entrega)
      * o PICKUP (Retiro)
@@ -119,6 +157,44 @@ public class OrderService {
             throw new IllegalArgumentException(
                 "Invalid dispatch type: " + value
                 + ". Allowed values: DELIVERY, PICKUP");
+        }
+    }
+
+    /**
+     * Lanza error cuando el valor del estado del pedido no es válido,
+     * asegurando que se usen los que ya están estipulados en el modelo.
+     */
+
+    private OrderStatus parseOrderStatus(String value) {
+        try {
+            return OrderStatus.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                "Estado del pedido inválido: " + value
+                + ". Valores permitidos: CREATED, IN_PREPARATION, "
+                + "READY, DISPATCHED, DELIVERED, CANCELLED");
+        }
+    }
+
+    /**
+     * Valida que el cambio de estado sea permitido según la máquina de
+     * transiciones, rechazando actualizaciones inválidas
+     */
+
+    private void validateTransition(OrderStatus current, OrderStatus next) {
+        boolean valid = switch (current) {
+            case CREATED -> next == OrderStatus.IN_PREPARATION
+                || next == OrderStatus.CANCELLED;
+            case IN_PREPARATION -> next == OrderStatus.READY
+                || next == OrderStatus.CANCELLED;
+            case READY -> next == OrderStatus.DISPATCHED;
+            case DISPATCHED -> next == OrderStatus.DELIVERED;
+            case DELIVERED, CANCELLED -> false;
+        };
+
+        if (!valid) {
+            throw new IllegalStateException(
+                "Transición inválida: " + current + " -> " + next);
         }
     }
 

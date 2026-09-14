@@ -17,7 +17,7 @@ public class ProductRequest {
     @Positive(message = "El precio debe ser mayor a 0")
     private BigDecimal price;
 
-    @Min(value = 0, message = "El stock no puede ser negativp")
+    @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
 
     @NotBlank

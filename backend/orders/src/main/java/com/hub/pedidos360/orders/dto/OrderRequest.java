@@ -9,6 +9,7 @@ import java.util.List;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class OrderRequest {
     @NotBlank(message = "El nombre del cliente es obligatorio")
     private String customerName;
 
-    @NotBlank(message = "El nombre del cliente es obligatorio")
+    @NotNull(message = "El ID del local es obligatorio")
     private Long branchId;
 
     @NotBlank(message = "El tipo de despacho es obligatorio")

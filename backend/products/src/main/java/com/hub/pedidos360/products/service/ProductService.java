@@ -1,9 +1,11 @@
 package com.hub.pedidos360.products.service;
 
 import com.hub.pedidos360.products.dto.ProductRequest;
+import com.hub.pedidos360.products.dto.ProductResponse;
 import com.hub.pedidos360.products.model.Product;
 import com.hub.pedidos360.products.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,20 +18,23 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAll() {
+        return productRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<Product> available() {
-        return productRepository.findByAvailableTrue();
+    public List<ProductResponse> available() {
+        return productRepository.findByAvailableTrue().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Product getById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+    public ProductResponse getById(Long id) {
+        return toResponse(getByIdEntity(id));
     }
 
-    public Product create(ProductRequest request) {
+    public ProductResponse create(ProductRequest request) {
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -37,33 +42,58 @@ public class ProductService {
         product.setStock(request.getStock());
         product.setCategory(request.getCategory());
         product.setAvailable(request.isAvailable());
-        return productRepository.save(product);
-}
+        return toResponse(productRepository.save(product));
+    }
 
-    public Product update(Long id, ProductRequest request) {
-        Product product = getById(id);
+    public ProductResponse update(Long id, ProductRequest request) {
+        Product product = getByIdEntity(id);
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setCategory(request.getCategory());
         product.setAvailable(request.isAvailable());
-        return productRepository.save(product);
+        return toResponse(productRepository.save(product));
     }
 
-    public Product decrementStock(Long id, int quantity) {
-        Product product = getById(id);
-        if (product.getStock() < quantity) {
+    /**
+     * Descuenta stock de forma atómica (UPDATE condicional en el repositorio).
+     * La verificación y el descuento ocurren en una única operación de base de
+     * datos, por lo que pedidos simultáneos no dejan el stock en negativo.
+     */
+    @Transactional
+    public ProductResponse decrementStock(Long id, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("La cantidad a descontar debe ser mayor a 0");
+        }
+
+        int updatedRows = productRepository.decrementStockIfAvailable(id, quantity);
+        if (updatedRows == 0) {
+            Product product = getByIdEntity(id);
             throw new InsufficientStockException(product.getName(), product.getStock(), quantity);
         }
-        product.setStock(product.getStock() - quantity);
-        return productRepository.save(product);
+
+        return getById(id);
     }
 
     public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException(id);
-        }
+        getByIdEntity(id);
         productRepository.deleteById(id);
+    }
+
+    private Product getByIdEntity(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+    }
+
+    private ProductResponse toResponse(Product product) {
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getCategory(),
+                product.isAvailable());
     }
 }

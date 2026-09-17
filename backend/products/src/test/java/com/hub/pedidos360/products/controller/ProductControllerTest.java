@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,13 +40,27 @@ class ProductControllerTest {
     }
 
     @Test
-    void createProductValidoDevuelve201() throws Exception {
+    void createProductSinTokenRetorna401() throws Exception {
         String body = """
                 {"name":"Arepa Sencilla","description":"De queso amarillo",
                  "price":8.50,"stock":10,"category":"Desayunos","available":true}
                 """;
 
         mockMvc.perform(post("/api/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void createProductValidoConTokenDevuelve201() throws Exception {
+        String body = """
+                {"name":"Arepa Sencilla","description":"De queso amarillo",
+                 "price":8.50,"stock":10,"category":"Desayunos","available":true}
+                """;
+
+        mockMvc.perform(post("/api/v1/products")
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
@@ -63,6 +78,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest())
@@ -79,6 +95,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest())
@@ -108,10 +125,11 @@ class ProductControllerTest {
     }
 
     @Test
-    void deleteDevuelve204YElProductoDesaparece() throws Exception {
+    void deleteConTokenDevuelve204YElProductoDesaparece() throws Exception {
         Product saved = productRepository.save(product("Para borrar", true));
 
-        mockMvc.perform(delete("/api/v1/products/" + saved.getId()))
+        mockMvc.perform(delete("/api/v1/products/" + saved.getId())
+                        .with(jwt()))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/products/" + saved.getId()))
@@ -119,10 +137,11 @@ class ProductControllerTest {
     }
 
     @Test
-    void decrementValidoDescuentaElStock() throws Exception {
+    void decrementValidoConTokenDescuentaElStock() throws Exception {
         Product saved = productRepository.save(product("Arepa", true));
 
         mockMvc.perform(post("/api/v1/products/" + saved.getId() + "/decrement")
+                        .with(jwt())
                         .param("quantity", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock").value(8));
@@ -133,6 +152,7 @@ class ProductControllerTest {
         Product saved = productRepository.save(product("Arepa", true));
 
         mockMvc.perform(post("/api/v1/products/" + saved.getId() + "/decrement")
+                        .with(jwt())
                         .param("quantity", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").exists());
@@ -141,6 +161,7 @@ class ProductControllerTest {
     @Test
     void decrementEnProductoInexistenteDevuelve404() throws Exception {
         mockMvc.perform(post("/api/v1/products/999999/decrement")
+                        .with(jwt())
                         .param("quantity", "1"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());

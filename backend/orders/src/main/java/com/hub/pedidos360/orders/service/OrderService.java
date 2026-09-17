@@ -28,11 +28,11 @@ public class OrderService {
      * haciendo el cálculo del total del pedido y validando el tipo de despacho
      * recibido para que solo sean valores permitidos
      */
-    public OrderResponse create(OrderRequest request) {
+    public OrderResponse create(String customerId, OrderRequest request) {
         DispatchType dispatchType = parseDispatchType(request.getDispatchType());
 
         Order order = new Order();
-        order.setCustomerId("pending");
+        order.setCustomerId(customerId);
         order.setCustomerName(request.getCustomerName());
         order.setBranchId(request.getBranchId());
         order.setDispatchType(dispatchType);

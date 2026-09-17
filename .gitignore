@@ -1,1 +1,15 @@
 .vscode
+
+# Dependencies
+node_modules/
+
+# Gradle
+**/.gradle/
+**/build/
+
+# Compiled output
+**/bin/
+*.class
+
+# Documentation
+contexto-caso/

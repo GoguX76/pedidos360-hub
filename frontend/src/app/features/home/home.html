@@ -19,4 +19,41 @@
     />
     <app-nav-card icon="🚪" title="Cerrar sesión" (cardClick)="onLogoutClick()" />
   </section>
+
+    <section class="home__section">
+      <h2 class="home__section-title">Productos</h2>
+
+      @if (loadingProducts) {
+        <p class="home__hint">Cargando productos…</p>
+      } @else if (errorProducts) {
+        <p class="home__hint home__hint--error">No se pudieron cargar los productos ({{ errorProducts }}).</p>
+      } @else if (products.length === 0) {
+        <p class="home__hint">No hay productos.</p>
+      } @else {
+        <ul class="home__list">
+          @for (product of products; track product) {
+            <li class="home__list-item">{{ product.name ?? product.id ?? 'Producto' }}</li>
+          }
+        </ul>
+      }
+    </section>
+    
+    <section class="home__section">
+      <h2 class="home__section-title">Pedidos</h2>
+
+    @if (loadingOrders) {
+      <p class="home__hint">Cargando pedidos…</p>
+    } @else if (errorOrders) {
+      <p class="home__hint home__hint--error">No se pudieron cargar los pedidos ({{ errorOrders }}).</p>
+    } @else if (orders.length === 0) {
+      <p class="home__hint">No hay pedidos.</p>
+    } @else {
+      <ul class="home__list">
+        @for (order of orders; track order) {
+          <li class="home__list-item">{{ order.id ?? 'Pedido' }}</li>
+        }
+      </ul>
+    }
+  </section>
+
 </div>

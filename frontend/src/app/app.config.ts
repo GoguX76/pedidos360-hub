@@ -62,10 +62,13 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string> | null>();
 
-  protectedResourceMap.set('http://localhost:8080/*', ['api://62985756-8182-4059-a3d6-2fadd8355b88/access_as_user']);
+  protectedResourceMap.set(
+    'https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com/api/v1/orders*',
+    ['api://62985756-8182-4059-a3d6-2fadd8355b88/access_as_user']
+  );
 
   return {
-    interactionType: InteractionType.Redirect,
+    interactionType: InteractionType.Popup,
     protectedResourceMap
   };
 }

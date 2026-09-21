@@ -23,15 +23,15 @@
     <section class="home__section">
       <h2 class="home__section-title">Productos</h2>
 
-      @if (loadingProducts) {
+      @if (loadingProducts()) {
         <p class="home__hint">Cargando productos…</p>
-      } @else if (errorProducts) {
-        <p class="home__hint home__hint--error">No se pudieron cargar los productos ({{ errorProducts }}).</p>
-      } @else if (products.length === 0) {
+      } @else if (errorProducts()) {
+        <p class="home__hint home__hint--error">No se pudieron cargar los productos ({{ errorProducts() }}).</p>
+      } @else if (products().length === 0) {
         <p class="home__hint">No hay productos.</p>
       } @else {
         <ul class="home__list">
-          @for (product of products; track product) {
+          @for (product of products(); track product) {
             <li class="home__list-item">{{ product.name ?? product.id ?? 'Producto' }}</li>
           }
         </ul>

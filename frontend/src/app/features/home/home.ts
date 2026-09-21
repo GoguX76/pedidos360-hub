@@ -15,11 +15,8 @@ export class Home implements OnInit {
   protected apiService = inject(ApiService);
 
   protected products: any[] = [];
-  protected orders: any[] = [];
   protected loadingProducts = true;
-  protected loadingOrders = true;
   protected errorProducts = '';
-  protected errorOrders = '';
 
   public ngOnInit(): void {
     this.apiService.getProducts().subscribe({
@@ -30,17 +27,6 @@ export class Home implements OnInit {
       error: (err) => {
         this.errorProducts = this.readError(err);
         this.loadingProducts = false;
-      },
-    });
-
-    this.apiService.getOrders().subscribe({
-      next: (data) => {
-        this.orders = this.toList(data, 'orders');
-        this.loadingOrders = false;
-      },
-      error: (err) => {
-        this.errorOrders = this.readError(err);
-        this.loadingOrders = false;
       },
     });
   }

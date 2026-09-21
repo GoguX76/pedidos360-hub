@@ -19,8 +19,4 @@ export class ApiService {
   public getProducts(): Observable<any> {
     return this.http.get(`${this.base}/api/v1/products`);
   }
-
-  public getOrders(): Observable<any> {
-    return this.http.get(`${this.base}/api/v1/orders`);
-  }
 }

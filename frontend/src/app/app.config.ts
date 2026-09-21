@@ -77,7 +77,6 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   // aunque la URL sea la del propio dominio, porque nginx proxea /api/*.
   const api = appOrigin();
 
-  protectedResourceMap.set(`${api}/api/v1/orders*`, [apiScope]);
   protectedResourceMap.set(`${api}/api/v1/products*`, [apiScope]);
 
   return {

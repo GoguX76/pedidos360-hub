@@ -6,7 +6,13 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly base = 'https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com';
+  /**
+   * Mismo origen (nginx proxea /api/* al gateway en prod y `ng serve`
+   * lo proxea en dev vía proxy.conf.json). Así no hay CORS: el navegador
+   * nunca hace preflight contra otro origen.
+   */
+  private readonly base =
+    typeof window !== 'undefined' ? window.location.origin : '';
 
   constructor(private http: HttpClient) {}
 

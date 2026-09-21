@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "target": "https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com",
+    "secure": true,
+    "changeOrigin": true
+  }
+}

@@ -73,13 +73,23 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string> | null>();
 
+  // Ambas colecciones exigen JWT: si products no está en el mapa, el
+  // interceptor no adjunta token y el gateway responde 401 siempre.
   protectedResourceMap.set(
     'https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com/api/v1/orders*',
     ['api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user']
   );
 
+  protectedResourceMap.set(
+    'https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com/api/v1/products*',
+    ['api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user']
+  );
+
   return {
-    interactionType: InteractionType.Popup,
+    // Redirect (no Popup): el login usa redirect y los navegadores suelen
+    // bloquear popups no gestuales, lo que dejaba las peticiones colgadas
+    // en "Cargando…" para siempre.
+    interactionType: InteractionType.Redirect,
     protectedResourceMap
   };
 }

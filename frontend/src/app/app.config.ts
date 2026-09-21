@@ -75,7 +75,7 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
 
   protectedResourceMap.set(
     'https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com/api/v1/orders*',
-    ['api://62985756-8182-4059-a3d6-2fadd8355b88/access_as_user']
+    ['api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user']
   );
 
   return {

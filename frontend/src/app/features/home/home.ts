@@ -1,4 +1,4 @@
-import { Component, inject, type OnInit } from '@angular/core';
+import { Component, inject, signal, type OnInit } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { ApiService } from '../../core/api/api.service';
 import { NavCardComponent } from '../../shared/ui/nav-card/nav-card';
@@ -14,19 +14,23 @@ export class Home implements OnInit {
   protected authService = inject(AuthService);
   protected apiService = inject(ApiService);
 
-  protected products: any[] = [];
-  protected loadingProducts = true;
-  protected errorProducts = '';
+  // Signals (no campos planos): la app es zoneless (Angular 22 sin zone.js)
+  // y solo los signals disparan change detection tras callbacks async.
+  // Con campos planos + interceptor MSAL la vista quedaba colgada en
+  // "Cargando..." aunque la data ya habia llegado.
+  protected products = signal<any[]>([]);
+  protected loadingProducts = signal(true);
+  protected errorProducts = signal('');
 
   public ngOnInit(): void {
     this.apiService.getProducts().subscribe({
       next: (data) => {
-        this.products = this.toList(data, 'products');
-        this.loadingProducts = false;
+        this.products.set(this.toList(data, 'products'));
+        this.loadingProducts.set(false);
       },
       error: (err) => {
-        this.errorProducts = this.readError(err);
-        this.loadingProducts = false;
+        this.errorProducts.set(this.readError(err));
+        this.loadingProducts.set(false);
       },
     });
   }

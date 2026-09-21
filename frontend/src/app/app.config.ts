@@ -25,16 +25,27 @@ import {
 import { routes } from './app.routes';
 
 /**
+ * Origen de la app en tiempo de ejecución. Así el login funciona tanto en
+ * local (http://localhost:4200) como en producción (https://34.230.203.32)
+ * sin cambiar código. El `typeof window` protege el prerender del build,
+ * que se ejecuta en Node donde `window` no existe.
+ */
+function appOrigin(): string {
+  return typeof window !== 'undefined' ? window.location.origin : 'http://localhost:4200';
+}
+
+/**
  * Crea la instancia principal de MSAL, usando los datos de tu
  * App Registration (clientId y tenant) que ya configuraste en Azure.
  */
 export function MSALInstanceFactory(): IPublicClientApplication {
+  const origin = appOrigin();
   return new PublicClientApplication({
     auth: {
       clientId: '4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4', // Id. de aplicación (cliente)
       authority: 'https://login.microsoftonline.com/6a3978a5-1a22-4be4-bbb8-a7c6279c471e', // Id. del Inquilino (Tenant)
-      redirectUri: 'http://localhost:4200', // La URL debe COINCIDIR con la que usa Azure
-      postLogoutRedirectUri: 'http://localhost:4200/login' // NUEVA línea: a dónde volver tras cerrar sesión
+      redirectUri: origin, // Debe COINCIDIR con las Redirect URIs SPA registradas en Azure
+      postLogoutRedirectUri: `${origin}/login` // A dónde volver tras cerrar sesión
     },
     cache: {
       cacheLocation: BrowserCacheLocation.LocalStorage // El token sobrevive si recargas la página

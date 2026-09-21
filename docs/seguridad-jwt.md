@@ -10,16 +10,25 @@ Cada microservicio Spring actúa como **OAuth2 Resource Server** y valida el tok
 |---|---|
 | Tenant (Entra ID) | `6a3978a5-1a22-4be4-bbb8-a7c6279c471e` |
 | Client ID (frontend) | `4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4` |
-| Scope de la API | `api://62985756-8182-4059-a3d6-2fadd8355b88/access_as_user` |
+| Scope de la API | `api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user` |
+| `aud` del token | `api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4` |
+| `iss` del token | `https://sts.windows.net/6a3978a5-1a22-4be4-bbb8-a7c6279c471e/` (token **v1**) |
+
+> El registro emite tokens **v1** (`accessTokenAcceptedVersion`/`requestedAccessTokenVersion` = 1),
+> por eso `iss` es `sts.windows.net` (no `/v2.0`) y `aud` es el URI `api://…` completo.
 
 ## Backend (orders y products, idéntico esquema)
 
 `application.properties`:
 
 ```properties
-spring.security.oauth2.resourceserver.jwt.issuer-uri=${AZURE_ISSUER_URI:https://login.microsoftonline.com/6a3978a5-1a22-4be4-bbb8-a7c6279c471e/v2.0}
-spring.security.oauth2.resourceserver.jwt.audiences=${AZURE_CLIENT_ID:4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4}
+spring.security.oauth2.resourceserver.jwt.issuer-uri=${AZURE_ISSUER_URI:https://login.microsoftonline.com/6a3978a5-1a22-4be4-bbb8-a7c6279c471e}
+spring.security.oauth2.resourceserver.jwt.audiences=${AZURE_AUDIENCES:api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4}
 ```
+
+* `issuer-uri` usa la **discovery v1** (sin `/v2.0`); Spring obtiene de ahí el issuer
+  real `http://sts.windows.net/<tenant>/` y valida la firma con esas claves.
+* `audiences` es el URI completo `api://…` (coincide con el `aud` del token).
 
 Dependencias (`build.gradle`): `spring-boot-starter-security`,
 `spring-boot-starter-oauth2-resource-server`.
@@ -50,6 +59,6 @@ En `orders`, el `POST /api/v1/orders` además extrae el `customerId` del claim
 | Variable | Efecto |
 |---|---|
 | `AZURE_ISSUER_URI` | Sobrescribe el emisor JWT |
-| `AZURE_CLIENT_ID` | Sobrescribe la audiencia JWT |
+| `AZURE_AUDIENCES` | Sobrescribe la audiencia JWT |
 | `DB_URL`, `DB_USER`, `DB_PASSWORD` | Conexión PostgreSQL |
 | `app.cors.allowed-origins` | Orígenes permitidos (propiedad Spring) |

@@ -1,4 +1,7 @@
 .vscode
+contexto-caso
+node_modules/
+backend/bin/
 
 # Dependencies
 node_modules/

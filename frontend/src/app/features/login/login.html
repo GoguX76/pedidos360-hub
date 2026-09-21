@@ -1,21 +1,72 @@
 <div class="login">
-  <div class="login__glow" aria-hidden="true"></div>
+  <header class="login__nav">
+    <div class="login__brand">
+      <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+      Pedidos360
+    </div>
+    <nav class="login__links">
+      <a href="javascript:void(0)">Cómo funciona</a>
+      <a href="javascript:void(0)">Para restaurantes</a>
+      <a href="javascript:void(0)">Precios</a>
+    </nav>
+    <div class="login__nav-actions">
+      <button class="btn btn--ghost" (click)="authService.login()">Iniciar sesión</button>
+      <button class="btn btn--ember" (click)="authService.login()">Registrarse</button>
+    </div>
+  </header>
 
-  <div class="login__card">
-    <p class="login__eyebrow">Pedidos360</p>
-    <h1 class="login__title">Tu cocina, en vivo</h1>
+  <section class="login__hero">
+    <div class="login__hero-copy">
+      <div class="login__status">
+        <span class="login__status-dot"></span>
+        Cocina conectada en este momento
+      </div>
+      <h1 class="login__title">Tu cocina, en vivo.</h1>
+      <p class="login__subtitle">
+        Mira cada pedido desde que entra hasta que sale por la puerta. Pedidos360 conecta a tu equipo de cocina con cada canal de venta, en tiempo real.
+      </p>
+    </div>
 
-    @if (authService.authenticatedUser()) {
-      <p class="login__message">Ya tienes una sesión activa.</p>
-      <button class="login__button login__button--secondary" (click)="onLogoutClick()">
-        Cerrar sesión
-      </button>
-    } @else {
-      <button class="login__button" (click)="onLoginClick()">
-        <img class="login__button-icon" src="/microsoft_logo.svg" alt="Logo de Microsoft">
-        Iniciar sesión
-      </button>
-    }
+     <div class="login__illustration">
+      <svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Ilustración de una olla con vapor y una ficha de pedido flotante</title>
+        <desc>Icono simple estilo línea: una olla de cocina con curvas de vapor subiendo, y una pequeña tarjeta de pedido con un check flotando al lado.</desc>
+        <style>
+          .stroke-ember{stroke:#E8A33D;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+          .stroke-cream{stroke:#F5EDE4;fill:none;stroke-width:2.5;stroke-linecap:round;}
+          .fill-surface{fill:#3A2E29;stroke:#E8A33D;stroke-width:3;}
+          .muted{stroke:#A89A8C;fill:none;stroke-width:2;stroke-linecap:round;}
+        </style>
+        <path class="stroke-ember" d="M270 190 C260 160 280 140 270 110" />
+        <path class="muted" d="M330 190 C320 155 345 130 332 95" />
+        <path class="stroke-ember" d="M390 190 C380 160 400 140 390 110" />
+        <path class="fill-surface" d="M230 220 h200 a10 10 0 0 1 10 10 c0 60 -50 100 -110 100 s-110 -40 -110 -100 a10 10 0 0 1 10 -10 z" />
+        <rect x="190" y="235" width="45" height="14" rx="7" class="fill-surface" />
+        <rect x="445" y="235" width="45" height="14" rx="7" class="fill-surface" />
+        <rect x="215" y="205" width="200" height="18" rx="9" class="fill-surface" />
+        <g>
+          <rect x="440" y="70" width="150" height="110" rx="12" fill="#3A2E29" stroke="#F5EDE4" stroke-width="2" />
+          <line x1="462" y1="100" x2="560" y2="100" class="stroke-cream" />
+          <line x1="462" y1="122" x2="540" y2="122" class="muted" />
+          <circle cx="475" cy="152" r="14" fill="none" stroke="#E8A33D" stroke-width="2.5" />
+          <path d="M468 152 l5 6 l11 -13" fill="none" stroke="#E8A33D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </g>
+      </svg>
+    </div>
+  </section>
 
-  </div>
+  <section class="login__features">
+    <div class="feature">
+      <h3>Un solo panel</h3>
+      <p>Todos tus canales — salón, delivery y para llevar — en una sola cocina digital, sin cruces de pedidos.</p>
+    </div>
+    <div class="feature">
+      <h3>Tiempos reales</h3>
+      <p>Sabe exactamente cuánto demora cada plato y dónde se están atrasando los pedidos, al segundo.</p>
+    </div>
+    <div class="feature">
+      <h3>Tu equipo, alineado</h3>
+      <p>Cocina, meseros y despacho ven lo mismo al mismo tiempo. Menos gritos, menos errores.</p>
+    </div>
+  </section>
 </div>

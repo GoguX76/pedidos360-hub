@@ -1,0 +1,86 @@
+.menu {
+  min-height: 100vh;
+  background: #1c1614;
+  color: #F5EDE4;
+  padding: 0 40px;
+}
+
+.menu__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.menu__brand {
+  color: #F5EDE4;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.menu__section {
+  margin-top: 40px;
+}
+
+.menu__section-title {
+  font-family: serif;
+  margin-bottom: 16px;
+}
+
+.menu__hint {
+  color: #A89A8C;
+}
+
+.menu__hint--error {
+  color: #E8A33D;
+}
+
+.menu__list {
+  list-style: none;
+  padding: 0;
+}
+
+.menu__list-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.menu__user-menu {
+  position: relative;
+}
+
+.menu__user {
+  background: none;
+  border: none;
+  color: #F5EDE4;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.menu__user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #3A2E29;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  z-index: 10;
+}
+
+.menu__back {
+  background: none;
+  border: none;
+  color: #F5EDE4;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.menu__back:hover {
+  color: #E8A33D;
+}

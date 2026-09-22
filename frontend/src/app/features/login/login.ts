@@ -1,45 +1,32 @@
-import { Component, effect,inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { Router } from '@angular/router';
+
 /**
  * Pantalla de inicio de sesión. Muestra un botón que dispara el
- * flujo de login vía MSAL, o un mensaje de bienvenida si el
- * usuario ya tiene una sesión activa.
+ * flujo de login vía MSAL, o el nombre del usuario si ya tiene una
+ * sesión activa. El link "Menú" navega a la página de productos.
  */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [], // vacío por ahora: no usamos ningún otro componente/directiva de Angular aquí
+  imports: [RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class LoginComponent {
-  // inject() nos permite pedirle a Angular el AuthService sin
-  // necesidad de declararlo en un constructor.
   protected authService = inject(AuthService);
-  private router = inject(Router);
 
-  constructor() {
-    effect(() => {
-      if (this.authService.authenticatedUser()) {
-        this.router.navigate(['/home']);
-      }
-    });
+  protected showUserMenu = signal(false);
+
+  protected onUserClick(): void {
+    this.showUserMenu.set(!this.showUserMenu());
   }
 
-  /**
-   * Dispara el flujo de login redirigiendo a Microsoft.
-   * La lógica real vive en AuthService — este componente solo
-   * reacciona al clic del usuario.
-   */
   protected onLoginClick(): void {
     this.authService.login();
   }
 
-  /**
-   * Cierra la sesión del usuario, tanto en la app como en Azure AD.
-   * La lógica real vive en AuthService — este método solo reacciona al clic.
-   */
   protected onLogoutClick(): void {
     this.authService.logOut();
   }

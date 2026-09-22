@@ -5,13 +5,21 @@
       Pedidos360
     </div>
     <nav class="login__links">
-      <a href="javascript:void(0)">Cómo funciona</a>
-      <a href="javascript:void(0)">Para restaurantes</a>
-      <a href="javascript:void(0)">Precios</a>
+      <a routerLink="/menu">Menú</a>
     </nav>
     <div class="login__nav-actions">
+      @if (authService.authenticatedUser()) {
+      <div class="login__user-menu">
+        <button class="login__user" (click)="onUserClick()">{{ authService.userName() }}</button>
+        @if (showUserMenu()) {
+          <div class="login__user-dropdown">
+            <button class="btn btn--ghost" (click)="onLogoutClick()">Cerrar sesión</button>
+          </div>
+        }
+      </div>
+    } @else {
       <button class="btn btn--ghost" (click)="authService.login()">Iniciar sesión</button>
-      <button class="btn btn--ember" (click)="authService.login()">Registrarse</button>
+    }
     </div>
   </header>
 

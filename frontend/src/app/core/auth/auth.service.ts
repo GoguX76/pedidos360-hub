@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { signal } from "@angular/core";
 import { MsalService } from "@azure/msal-angular";
 import { MsalBroadcastService } from "@azure/msal-angular";
-import { EventType,InteractionStatus } from "@azure/msal-browser";
+import { EventType, InteractionStatus } from "@azure/msal-browser";
 import { Subject, filter, takeUntil } from "rxjs";
 
 /**
@@ -15,7 +15,6 @@ import { Subject, filter, takeUntil } from "rxjs";
  * mantener `authenticatedUser` sincronizado automáticamente, en vez de
  * que cada componente tenga que consultar el estado de login por su cuenta.
  */
-
 @Injectable({
     providedIn: 'root'
 })
@@ -26,6 +25,12 @@ export class AuthService implements OnDestroy {
      * para decidir qué mostrar en pantalla (ej. botón de login vs. datos del usuario).
      */
     public authenticatedUser = signal<boolean>(false);
+
+    /**
+     * Nombre del usuario autenticado (viene de la cuenta de MSAL).
+     * null si no hay sesión activa.
+     */
+    public userName = signal<string | null>(null);
 
     /**
      * Subject interno usado únicamente para cancelar las suscripciones
@@ -50,7 +55,9 @@ export class AuthService implements OnDestroy {
                 takeUntil(this.destroy$)
             )
             .subscribe(() => {
-                this.authenticatedUser.set(this.msalService.instance.getAllAccounts().length > 0);
+                const accounts = this.msalService.instance.getAllAccounts();
+                this.authenticatedUser.set(accounts.length > 0);
+                this.userName.set(accounts[0]?.name ?? null);
             });
 
         this.msalBroadcastService.msalSubject$
@@ -63,6 +70,8 @@ export class AuthService implements OnDestroy {
             )
             .subscribe(() => {
                 this.authenticatedUser.set(true);
+                const accounts = this.msalService.instance.getAllAccounts();
+                this.userName.set(accounts[0]?.name ?? null);
             });
     }
 
@@ -84,6 +93,7 @@ export class AuthService implements OnDestroy {
     public logOut(): void {
         this.msalService.logoutRedirect();
         this.authenticatedUser.set(false);
+        this.userName.set(null);
     }
 
     ngOnDestroy(): void {

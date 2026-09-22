@@ -1,0 +1,32 @@
+<div class="menu">
+  <header class="menu__nav">
+    <div class="menu__brand">
+      <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+      Pedidos360
+    </div>
+    <button class="menu__back" (click)="onBackClick()">← Volver</button>
+  </header>
+
+  <section class="menu__section">
+    <h2 class="menu__section-title">Productos</h2>
+
+    @if (loadingProducts()) {
+      <p class="menu__hint">Cargando productos…</p>
+    } @else if (errorProducts()) {
+      <p class="menu__hint menu__hint--error">No se pudieron cargar los productos ({{ errorProducts() }}).</p>
+    } @else if (products().length === 0) {
+      <p class="menu__hint">No hay productos.</p>
+    } @else {
+      <ul class="menu__list">
+        @for (product of products(); track product) {
+          <li class="menu__list-item">
+            <span class="menu__list-name">{{ product.name ?? product.id ?? 'Producto' }}</span>
+            @if (product.description) {
+              <span class="menu__list-desc">{{ product.description }}</span>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

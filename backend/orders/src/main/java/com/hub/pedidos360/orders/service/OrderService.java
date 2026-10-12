@@ -9,7 +9,12 @@ import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderItem;
 import com.hub.pedidos360.orders.model.OrderStatus;
 import com.hub.pedidos360.orders.repository.OrderRepository;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,6 +33,7 @@ public class OrderService {
      * haciendo el cálculo del total del pedido y validando el tipo de despacho
      * recibido para que solo sean valores permitidos
      */
+    @Transactional
     public OrderResponse create(String customerId, OrderRequest request) {
         DispatchType dispatchType = parseDispatchType(request.getDispatchType());
 
@@ -143,6 +149,11 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
         return toResponse(saved);
+    }
+
+    public Page<OrderResponse> findAll(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+            .map(this::toResponse);
     }
 
     /**

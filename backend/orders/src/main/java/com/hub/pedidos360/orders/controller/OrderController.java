@@ -19,6 +19,9 @@ import com.hub.pedidos360.orders.dto.OrderStatusRequest;
 import com.hub.pedidos360.orders.model.OrderStatus;
 import com.hub.pedidos360.orders.service.OrderService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import jakarta.validation.Valid;
 import java.util.List;
 
@@ -30,6 +33,14 @@ public class OrderController {
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
+    }
+
+    /**
+     * Devuelve el listado paginado de pedidos
+     */
+    @GetMapping
+    public ResponseEntity<Page<OrderResponse>> findAll(Pageable pageable) {
+        return ResponseEntity.ok(orderService.findAll(pageable));
     }
 
     /**
@@ -74,6 +85,9 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> create(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderRequest request) {
         String customerId = jwt.getClaimAsString("oid");
+        if (customerId == null || customerId.isBlank()) {
+            throw new IllegalArgumentException("Token inválido: falta claim 'oid' (identificador de usuario)");
+        }
         OrderResponse response = orderService.create(customerId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -4,6 +4,7 @@ import com.hub.pedidos360.orders.dto.OrderItemRequest;
 import com.hub.pedidos360.orders.dto.OrderItemResponse;
 import com.hub.pedidos360.orders.dto.OrderRequest;
 import com.hub.pedidos360.orders.dto.OrderResponse;
+import com.hub.pedidos360.orders.messaging.OrderCreatedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderItem;
@@ -23,9 +24,11 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderCreatedPublisher orderCreatedPublisher;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, OrderCreatedPublisher orderCreatedPublisher) {
         this.orderRepository = orderRepository;
+        this.orderCreatedPublisher = orderCreatedPublisher;
     }
 
     /**
@@ -48,6 +51,7 @@ public class OrderService {
 
         for (OrderItemRequest itemRequest : request.getItems()) {
             OrderItem item = new OrderItem();
+            item.setProductId(itemRequest.getProductId());
             item.setProductName(itemRequest.getProductName());
             item.setQuantity(itemRequest.getQuantity());
             item.setUnitPrice(itemRequest.getUnitPrice());
@@ -63,6 +67,7 @@ public class OrderService {
         order.setTotalAmount(total);
 
         Order saved = orderRepository.save(order);
+        orderCreatedPublisher.publish(saved);
         return toResponse(saved);
     }
 

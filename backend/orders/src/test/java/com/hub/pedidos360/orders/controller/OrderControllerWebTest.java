@@ -52,7 +52,7 @@ class OrderControllerWebTest {
         request.setCustomerName("Ana");
         request.setBranchId(1L);
         request.setDispatchType("PICKUP");
-        request.setItems(List.of(new OrderItemRequest("Arepa", 2, new BigDecimal("5.50"))));
+        request.setItems(List.of(new OrderItemRequest(10L, "Arepa", 2, new BigDecimal("5.50"))));
 
         mockMvc.perform(post("/api/v1/orders")
                 .with(jwt().jwt(jwt -> jwt.claim("oid", "oid-123")))

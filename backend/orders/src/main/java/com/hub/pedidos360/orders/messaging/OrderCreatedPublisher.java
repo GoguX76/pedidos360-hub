@@ -1,5 +1,6 @@
 package com.hub.pedidos360.orders.messaging;
 
+import com.hub.pedidos360.orders.config.RabbitMQConfig;
 import com.hub.pedidos360.orders.model.Order;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -10,8 +11,8 @@ import java.util.Set;
 @Component
 public class OrderCreatedPublisher {
 
-    public static final String EXCHANGE = "pedidos360.events";
-    public static final String ROUTING_KEY = "order.created";
+    public static final String EXCHANGE = RabbitMQConfig.EXCHANGE_EVENTS;
+    public static final String ROUTING_KEY = RabbitMQConfig.ROUTING_ORDER_CREATED;
 
     private final EventPublisher eventPublisher;
     private final Validator validator;

@@ -5,6 +5,7 @@ import com.hub.pedidos360.orders.dto.OrderItemResponse;
 import com.hub.pedidos360.orders.dto.OrderRequest;
 import com.hub.pedidos360.orders.dto.OrderResponse;
 import com.hub.pedidos360.orders.messaging.OrderCreatedPublisher;
+import com.hub.pedidos360.orders.messaging.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderItem;
@@ -25,10 +26,14 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderCreatedPublisher orderCreatedPublisher;
+    private final OrderStatusChangedPublisher orderStatusChangedPublisher;
 
-    public OrderService(OrderRepository orderRepository, OrderCreatedPublisher orderCreatedPublisher) {
+    public OrderService(OrderRepository orderRepository,
+                        OrderCreatedPublisher orderCreatedPublisher,
+                        OrderStatusChangedPublisher orderStatusChangedPublisher) {
         this.orderRepository = orderRepository;
         this.orderCreatedPublisher = orderCreatedPublisher;
+        this.orderStatusChangedPublisher = orderStatusChangedPublisher;
     }
 
     /**
@@ -124,6 +129,7 @@ public class OrderService {
      * listo o en reparto
      */
 
+    @Transactional
     public OrderResponse updateStatus(Long id, String newStatus) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new OrderNotFoundException(id));
@@ -131,8 +137,10 @@ public class OrderService {
         OrderStatus status = parseOrderStatus(newStatus);
         validateTransition(order.getStatus(), status);
 
+        OrderStatus previousStatus = order.getStatus();
         order.setStatus(status);
         Order saved = orderRepository.save(order);
+        orderStatusChangedPublisher.publish(saved, previousStatus);
         return toResponse(saved);
     }
 
@@ -140,7 +148,7 @@ public class OrderService {
      * Permite cancelar un pedido mediante su ID si este ya
      * fue creado
      */
-
+    @Transactional
     public OrderResponse cancel(Long id) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new OrderNotFoundException(id));
@@ -151,8 +159,10 @@ public class OrderService {
                 + "Estado actual: " + order.getStatus());
         }
 
+        OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
+        orderStatusChangedPublisher.publish(saved, previousStatus);
         return toResponse(saved);
     }
 

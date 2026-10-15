@@ -31,6 +31,9 @@ class OrderControllerWebTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @org.springframework.test.context.bean.override.mockito.MockitoBean
+    private com.hub.pedidos360.orders.messaging.EventPublisher eventPublisher;
+
     @Test
     void crearPedido_SinToken_Retorna401() throws Exception {
         mockMvc.perform(post("/api/v1/orders")

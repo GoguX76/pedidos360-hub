@@ -1,11 +1,20 @@
 package com.hub.pedidos360.products.messaging;
 
 import com.hub.pedidos360.products.config.RabbitMQConfig;
+import com.hub.pedidos360.products.dto.ProductResponse;
 import com.hub.pedidos360.products.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class StockLowPublisher {
+
+    private static final Logger log = LoggerFactory.getLogger(StockLowPublisher.class);
+    public static final int STOCK_THRESHOLD = 10;
+
     private final EventPublisher eventPublisher;
     private final ProductService productService;
 
@@ -15,12 +24,26 @@ public class StockLowPublisher {
     }
 
     public void checkAndPublish(Long productId) {
-        var product = productService.getById(productId);
-        if (product.getStock() <= 10) {
+        ProductResponse product = productService.getById(productId);
+        checkAndPublish(product);
+    }
+
+    public void checkAndPublish(ProductResponse product) {
+        if (product.getStock() <= STOCK_THRESHOLD) {
+            StockLowEvent event = new StockLowEvent(
+                    product.getId(),
+                    product.getName(),
+                    product.getStock(),
+                    STOCK_THRESHOLD,
+                    LocalDateTime.now()
+            );
             eventPublisher.publish(
-                RabbitMQConfig.EXCHANGE_INVENTORY,
-                RabbitMQConfig.ROUTING_STOCK_LOW,
-                "Stock bajo para producto " + product.getId() + ": " + product.getStock());
+                    RabbitMQConfig.EXCHANGE_INVENTORY,
+                    RabbitMQConfig.ROUTING_STOCK_LOW,
+                    event
+            );
+            log.info("Alerta de stock bajo emitida para producto '{}' (ID: {}). Stock restante: {}",
+                    product.getName(), product.getId(), product.getStock());
         }
     }
 }

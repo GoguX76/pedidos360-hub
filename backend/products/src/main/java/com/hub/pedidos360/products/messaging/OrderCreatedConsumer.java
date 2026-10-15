@@ -1,6 +1,7 @@
 package com.hub.pedidos360.products.messaging;
 
 import com.hub.pedidos360.products.config.RabbitMQConfig;
+import com.hub.pedidos360.products.dto.ProductResponse;
 import com.hub.pedidos360.products.service.ProductService;
 import com.rabbitmq.client.Channel;
 import jakarta.validation.ConstraintViolation;
@@ -21,10 +22,12 @@ public class OrderCreatedConsumer {
 
     private final ProductService productService;
     private final Validator validator;
+    private final StockLowPublisher stockLowPublisher;
 
-    public OrderCreatedConsumer(ProductService productService, Validator validator) {
+    public OrderCreatedConsumer(ProductService productService, Validator validator, StockLowPublisher stockLowPublisher) {
         this.productService = productService;
         this.validator = validator;
+        this.stockLowPublisher = stockLowPublisher;
     }
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_ORDER_CREATED)
@@ -36,12 +39,13 @@ public class OrderCreatedConsumer {
                 throw new IllegalArgumentException("Evento inválido: " + violations);
             }
             for (OrderItemEvent item : event.getItems()) {
-                productService.decrementStock(item.getProductId(), item.getQuantity());
+                ProductResponse updated = productService.decrementStock(item.getProductId(), item.getQuantity());
+                stockLowPublisher.checkAndPublish(updated);
             }
             channel.basicAck(deliveryTag, false);
             log.info("Pedido {} procesado: stock descontado", event.getOrderId());
         } catch (Exception e) {
-            log.error("Error procesando pedido {}: {}", event.getOrderId(), e.getMessage());
+            log.error("Error procesando pedido {} (enviando mensaje a DLQ): {}", event.getOrderId(), e.getMessage());
             channel.basicReject(deliveryTag, false);
         }
     }

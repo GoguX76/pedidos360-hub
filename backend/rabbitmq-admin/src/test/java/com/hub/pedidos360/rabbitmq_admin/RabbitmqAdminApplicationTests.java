@@ -1,12 +1,13 @@
-package com.hub.pedidos360.admin;
+package com.hub.pedidos360.rabbitmq_admin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RabbitAdminApplicationTests {
+class RabbitmqAdminApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
+	@Test
+	void contextLoads() {
+	}
+
 }

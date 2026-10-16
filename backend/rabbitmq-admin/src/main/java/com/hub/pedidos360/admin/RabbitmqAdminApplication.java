@@ -1,4 +1,4 @@
-package com.hub.pedidos360.rabbitmq_admin;
+package com.hub.pedidos360.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

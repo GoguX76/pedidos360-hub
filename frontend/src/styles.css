@@ -1,16 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Work+Sans:wght@400;500;600&display=swap');
+@import "tailwindcss";
 
-:root {
-  --color-bg: #221C1A;
-  --color-surface: #3A2E29;
-  --color-ember: #E8A33D;
-  --color-ember-hover: #C98A2C;
-  --color-text: #F5EDE4;
-  --color-text-muted: #A89A8C;
+/* Tailwind escanea las plantillas y el TS de la app */
+@source "./app/**/*.{html,ts}";
+
+/* Design tokens de Pedidos360 expuestos como utilidades de Tailwind.
+   Ej.: --color-ember  ->  bg-ember / text-ember / border-ember
+        --font-display ->  font-display                              */
+@theme {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #221c1a;
+  --color-bg-deep: #1c1614;
+  --color-surface: #3a2e29;
+  --color-surface-2: #2a2220;
+  --color-ember: #e8a33d;
+  --color-ember-hover: #c98a2c;
+  --color-ink: #f5ede4;
+  --color-ink-muted: #a89a8c;
+  --color-success: #9ed46b;
+  --color-warning: #e8a33d;
+  --color-danger: #e5484d;
+}
+
+/* Fondo base. Se fija con valores literales (no solo con var()) para que el
+   fondo oscuro se aplique aunque las variables de tema no resuelvan. */
+html {
+  scroll-behavior: smooth;
+  background-color: #221c1a;
 }
 
 body {
   margin: 0;
-  background-color: var(--color-bg);
-  font-family: 'Work Sans', sans-serif;
+  min-height: 100vh;
+  background-color: #221c1a;
+  color: #f5ede4;
+  font-family: var(--font-sans), "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }

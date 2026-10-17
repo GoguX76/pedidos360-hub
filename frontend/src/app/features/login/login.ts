@@ -1,33 +1,25 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { CATALOG_CATEGORIES } from '../../core/catalog/categories';
 
 /**
- * Pantalla de inicio de sesión. Muestra un botón que dispara el
- * flujo de login vía MSAL, o el nombre del usuario si ya tiene una
- * sesión activa. El link "Menú" navega a la página de productos.
+ * Página de inicio (pública). Muestra el hero de presentación y una
+ * grilla de categorías destacadas que llevan al menú filtrado.
+ * La barra superior la aporta el AppShell (header compartido).
  */
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class LoginComponent {
   protected authService = inject(AuthService);
-
-  protected showUserMenu = signal(false);
-
-  protected onUserClick(): void {
-    this.showUserMenu.set(!this.showUserMenu());
-  }
+  protected readonly categories = CATALOG_CATEGORIES;
 
   protected onLoginClick(): void {
     this.authService.login();
-  }
-
-  protected onLogoutClick(): void {
-    this.authService.logOut();
   }
 }

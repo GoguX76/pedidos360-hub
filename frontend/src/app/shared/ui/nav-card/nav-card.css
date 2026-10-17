@@ -19,7 +19,7 @@
   text-align: left;
   text-decoration: none;
   font-family: 'Work Sans', sans-serif;
-  color: var(--color-text);
+  color: var(--color-ink);
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
@@ -56,7 +56,7 @@
 
 .nav-card__description {
   font-size: 0.85rem;
-  color: var(--color-text-muted);
+  color: var(--color-ink-muted);
 }
 
 .nav-card__badge {
@@ -66,8 +66,8 @@
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-text-muted);
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-ink-muted);
   border-radius: 999px;
   padding: 0.15rem 0.5rem;
 }

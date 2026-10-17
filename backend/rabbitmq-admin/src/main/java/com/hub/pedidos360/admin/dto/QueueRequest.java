@@ -13,11 +13,11 @@ public class QueueRequest {
     @NotBlank(message = "El nombre de la cola es obligatorio")
     private String name;
 
-    private boolean durable = true;
+    private Boolean durable = true;
 
-    private boolean exclusive = false;
+    private Boolean exclusive = false;
 
-    private boolean autoDelete = false;
+    private Boolean autoDelete = false;
 
     private String deadLetterExchange;
 

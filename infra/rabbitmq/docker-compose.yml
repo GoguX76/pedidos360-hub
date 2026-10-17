@@ -65,13 +65,25 @@ services:
       - bash
       - -c
       - |
-        echo "Esperando a que rabbit2 este listo..."
-        sleep 10
-        echo "Uniendo rabbit2 al cluster..."
-        rabbitmqctl -n rabbit@rabbit2 stop_app
-        rabbitmqctl -n rabbit@rabbit2 join_cluster rabbit@rabbit1
-        rabbitmqctl -n rabbit@rabbit2 start_app
-        echo "Cluster unido exitosamente!"
+        echo "Esperando a que rabbit1 y rabbit2 esten completamente listos..."
+        until rabbitmq-diagnostics -n rabbit@rabbit1 -q ping && rabbitmq-diagnostics -n rabbit@rabbit2 -q ping; do
+          sleep 2
+        done
+        echo "Ambos nodos estan respondiendo."
+
+        echo "Verificando si rabbit2 ya pertenece al cluster de rabbit1..."
+        if rabbitmqctl -n rabbit@rabbit2 cluster_status | grep -q "rabbit@rabbit1"; then
+          echo "rabbit2 ya forma parte del cluster con rabbit1. No se requiere accion."
+        else
+          echo "Uniendo rabbit2 al cluster..."
+          rabbitmqctl -n rabbit@rabbit2 stop_app
+          rabbitmqctl -n rabbit@rabbit2 reset
+          rabbitmqctl -n rabbit@rabbit2 join_cluster rabbit@rabbit1
+          rabbitmqctl -n rabbit@rabbit2 start_app
+          echo "Cluster unido exitosamente!"
+        fi
+
+        echo "Estado consolidado del cluster:"
         rabbitmqctl -n rabbit@rabbit1 cluster_status
 
 networks:

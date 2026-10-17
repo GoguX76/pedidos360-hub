@@ -55,8 +55,12 @@ public class RabbitAdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(rabbitAdminService.createBinding(request));
     }
 
-    @DeleteMapping("/bindings")
-    public ResponseEntity<AdminActionResponse> deleteBinding(@Valid @RequestBody BindingRequest request) {
+    @DeleteMapping("/bindings/{queueName}/{exchangeName}/{routingKey}")
+    public ResponseEntity<AdminActionResponse> deleteBinding(
+            @PathVariable String queueName,
+            @PathVariable String exchangeName,
+            @PathVariable String routingKey) {
+        BindingRequest request = new BindingRequest(queueName, exchangeName, routingKey);
         return ResponseEntity.ok(rabbitAdminService.deleteBinding(request));
     }
 }

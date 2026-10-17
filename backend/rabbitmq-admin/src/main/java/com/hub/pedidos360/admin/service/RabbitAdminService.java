@@ -49,14 +49,15 @@ public class RabbitAdminService {
 
         Queue queue = new Queue(
                 request.getName(),
-                request.isDurable(),
-                request.isExclusive(),
-                request.isAutoDelete(),
+                Boolean.TRUE.equals(request.getDurable()),
+                Boolean.TRUE.equals(request.getExclusive()),
+                Boolean.TRUE.equals(request.getAutoDelete()),
                 arguments);
 
         rabbitAdmin.declareQueue(queue);
         log.info("Cola '{}' creada (durable={}, exclusive={}, autoDelete={})",
-                request.getName(), request.isDurable(), request.isExclusive(), request.isAutoDelete());
+                request.getName(), Boolean.TRUE.equals(request.getDurable()),
+                Boolean.TRUE.equals(request.getExclusive()), Boolean.TRUE.equals(request.getAutoDelete()));
 
         return build(true, "Cola creada correctamente", TYPE_QUEUE, request.getName());
     }
@@ -77,7 +78,8 @@ public class RabbitAdminService {
         Exchange exchange = buildExchange(request);
         rabbitAdmin.declareExchange(exchange);
         log.info("Exchange '{}' creado (tipo={}, durable={}, autoDelete={})",
-                request.getName(), request.getType(), request.isDurable(), request.isAutoDelete());
+                request.getName(), request.getType(),
+                Boolean.TRUE.equals(request.getDurable()), Boolean.TRUE.equals(request.getAutoDelete()));
 
         return build(true, "Exchange creado correctamente", TYPE_EXCHANGE, request.getName());
     }
@@ -111,10 +113,10 @@ public class RabbitAdminService {
     private Exchange buildExchange(ExchangeRequest request) {
         String type = request.getType() == null ? "" : request.getType().toLowerCase();
         return switch (type) {
-            case "direct" -> new DirectExchange(request.getName(), request.isDurable(), request.isAutoDelete());
-            case "topic" -> new TopicExchange(request.getName(), request.isDurable(), request.isAutoDelete());
-            case "fanout" -> new FanoutExchange(request.getName(), request.isDurable(), request.isAutoDelete());
-            case "headers" -> new HeadersExchange(request.getName(), request.isDurable(), request.isAutoDelete());
+            case "direct" -> new DirectExchange(request.getName(), Boolean.TRUE.equals(request.getDurable()), Boolean.TRUE.equals(request.getAutoDelete()));
+            case "topic" -> new TopicExchange(request.getName(), Boolean.TRUE.equals(request.getDurable()), Boolean.TRUE.equals(request.getAutoDelete()));
+            case "fanout" -> new FanoutExchange(request.getName(), Boolean.TRUE.equals(request.getDurable()), Boolean.TRUE.equals(request.getAutoDelete()));
+            case "headers" -> new HeadersExchange(request.getName(), Boolean.TRUE.equals(request.getDurable()), Boolean.TRUE.equals(request.getAutoDelete()));
             default -> throw new IllegalArgumentException(
                     "Tipo de exchange no soportado: '" + request.getType() + "'. Valores permitidos: direct, topic, fanout, headers");
         };

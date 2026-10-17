@@ -16,7 +16,7 @@ public class ExchangeRequest {
     @NotBlank(message = "El tipo de exchange es obligatorio")
     private String type;
 
-    private boolean durable = true;
+    private Boolean durable = true;
 
-    private boolean autoDelete = false;
+    private Boolean autoDelete = false;
 }

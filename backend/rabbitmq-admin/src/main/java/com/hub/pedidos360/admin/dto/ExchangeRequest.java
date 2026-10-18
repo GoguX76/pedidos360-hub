@@ -3,10 +3,8 @@ package com.hub.pedidos360.admin.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class ExchangeRequest {
 
@@ -16,7 +14,13 @@ public class ExchangeRequest {
     @NotBlank(message = "El tipo de exchange es obligatorio")
     private String type;
 
-    private Boolean durable = true;
+    private Boolean durable;
 
-    private Boolean autoDelete = false;
+    private Boolean autoDelete;
+
+    /** Valores por defecto cuando el cliente no envía estos campos. */
+    public ExchangeRequest() {
+        this.durable = true;
+        this.autoDelete = false;
+    }
 }

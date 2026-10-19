@@ -4,14 +4,17 @@ import com.hub.pedidos360.orders.dto.OrderItemRequest;
 import com.hub.pedidos360.orders.dto.OrderItemResponse;
 import com.hub.pedidos360.orders.dto.OrderRequest;
 import com.hub.pedidos360.orders.dto.OrderResponse;
-import com.hub.pedidos360.orders.messaging.OrderCreatedPublisher;
-import com.hub.pedidos360.orders.messaging.OrderStatusChangedPublisher;
+import com.hub.pedidos360.messaging.AfterCommitExecutor;
+import com.hub.pedidos360.orders.messaging.order.OrderCreatedPublisher;
+import com.hub.pedidos360.orders.messaging.order.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderItem;
 import com.hub.pedidos360.orders.model.OrderStatus;
 import com.hub.pedidos360.orders.repository.OrderRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,8 @@ import java.util.List;
 
 @Service
 public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
     private final OrderCreatedPublisher orderCreatedPublisher;
@@ -72,7 +77,7 @@ public class OrderService {
         order.setTotalAmount(total);
 
         Order saved = orderRepository.save(order);
-        orderCreatedPublisher.publish(saved);
+        publishAfterCommit(() -> orderCreatedPublisher.publish(saved));
         return toResponse(saved);
     }
 
@@ -140,7 +145,7 @@ public class OrderService {
         OrderStatus previousStatus = order.getStatus();
         order.setStatus(status);
         Order saved = orderRepository.save(order);
-        orderStatusChangedPublisher.publish(saved, previousStatus);
+        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
         return toResponse(saved);
     }
 
@@ -162,13 +167,28 @@ public class OrderService {
         OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
-        orderStatusChangedPublisher.publish(saved, previousStatus);
+        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
         return toResponse(saved);
     }
 
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable)
             .map(this::toResponse);
+    }
+
+    /**
+     * Publica el evento recien cuando la transaccion hizo commit, para no
+     * notificar cambios que la base de datos podria revertir. Si el broker
+     * falla, se registra el error sin romper la operacion ya confirmada.
+     */
+    private void publishAfterCommit(Runnable publishAction) {
+        AfterCommitExecutor.afterCommit(() -> {
+            try {
+                publishAction.run();
+            } catch (RuntimeException e) {
+                log.error("No se pudo publicar el evento en el broker: {}", e.getMessage(), e);
+            }
+        });
     }
 
     /**

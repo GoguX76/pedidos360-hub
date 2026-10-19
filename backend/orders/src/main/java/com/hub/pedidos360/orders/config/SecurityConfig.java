@@ -36,6 +36,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/orders", "/api/v1/orders/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyRole("CLIENTE", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/*/status").hasAnyRole("CLIENTE", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/*").hasAnyRole("CLIENTE", "ADMIN")
                 .anyRequest().authenticated())
             .build();
     }

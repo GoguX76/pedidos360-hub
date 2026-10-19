@@ -1,7 +1,8 @@
-package com.hub.pedidos360.products.messaging;
+package com.hub.pedidos360.products.messaging.inventory;
 
-import com.hub.pedidos360.products.config.RabbitMQConfig;
+import com.hub.pedidos360.messaging.MessagingTopology;
 import com.hub.pedidos360.products.dto.ProductResponse;
+import com.hub.pedidos360.products.messaging.EventPublisher;
 import com.hub.pedidos360.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,8 +45,8 @@ class StockLowPublisherTest {
 
         ArgumentCaptor<StockLowEvent> eventCaptor = ArgumentCaptor.forClass(StockLowEvent.class);
         verify(eventPublisher, times(1)).publish(
-                eq(RabbitMQConfig.EXCHANGE_INVENTORY),
-                eq(RabbitMQConfig.ROUTING_STOCK_LOW),
+                eq(MessagingTopology.INVENTORY_EXCHANGE),
+                eq(MessagingTopology.STOCK_LOW_ROUTING_KEY),
                 eventCaptor.capture()
         );
 
@@ -79,8 +80,8 @@ class StockLowPublisherTest {
 
         verify(productService, times(1)).getById(3L);
         verify(eventPublisher, times(1)).publish(
-                eq(RabbitMQConfig.EXCHANGE_INVENTORY),
-                eq(RabbitMQConfig.ROUTING_STOCK_LOW),
+                eq(MessagingTopology.INVENTORY_EXCHANGE),
+                eq(MessagingTopology.STOCK_LOW_ROUTING_KEY),
                 any(StockLowEvent.class)
         );
     }

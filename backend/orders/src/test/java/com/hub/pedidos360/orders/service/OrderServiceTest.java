@@ -1,8 +1,8 @@
 package com.hub.pedidos360.orders.service;
 
 import com.hub.pedidos360.orders.dto.OrderResponse;
-import com.hub.pedidos360.orders.messaging.OrderCreatedPublisher;
-import com.hub.pedidos360.orders.messaging.OrderStatusChangedPublisher;
+import com.hub.pedidos360.orders.messaging.order.OrderCreatedPublisher;
+import com.hub.pedidos360.orders.messaging.order.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderStatus;

@@ -1,7 +1,8 @@
-package com.hub.pedidos360.products.messaging;
+package com.hub.pedidos360.products.messaging.inventory;
 
-import com.hub.pedidos360.products.config.RabbitMQConfig;
+import com.hub.pedidos360.messaging.MessagingTopology;
 import com.hub.pedidos360.products.dto.ProductResponse;
+import com.hub.pedidos360.products.messaging.EventPublisher;
 import com.hub.pedidos360.products.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * Publica la alerta de stock bajo del dominio de inventario.
+ */
 @Component
 public class StockLowPublisher {
 
@@ -38,8 +42,8 @@ public class StockLowPublisher {
                     LocalDateTime.now()
             );
             eventPublisher.publish(
-                    RabbitMQConfig.EXCHANGE_INVENTORY,
-                    RabbitMQConfig.ROUTING_STOCK_LOW,
+                    MessagingTopology.INVENTORY_EXCHANGE,
+                    MessagingTopology.STOCK_LOW_ROUTING_KEY,
                     event
             );
             log.info("Alerta de stock bajo emitida para producto '{}' (ID: {}). Stock restante: {}",

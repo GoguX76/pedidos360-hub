@@ -6,3 +6,7 @@ pluginManagement {
     }
 }
 rootProject.name = 'orders'
+
+// Modulo compartido con la topologia de mensajeria (nombres unicos para todos
+// los servicios) construido en composite build junto a este proyecto.
+includeBuild('../common-messaging')

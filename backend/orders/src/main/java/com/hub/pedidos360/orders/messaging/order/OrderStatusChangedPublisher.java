@@ -1,6 +1,7 @@
-package com.hub.pedidos360.orders.messaging;
+package com.hub.pedidos360.orders.messaging.order;
 
-import com.hub.pedidos360.orders.config.RabbitMQConfig;
+import com.hub.pedidos360.messaging.MessagingTopology;
+import com.hub.pedidos360.orders.messaging.EventPublisher;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderStatus;
 import jakarta.validation.ConstraintViolation;
@@ -17,8 +18,8 @@ public class OrderStatusChangedPublisher {
 
     private static final Logger log = LoggerFactory.getLogger(OrderStatusChangedPublisher.class);
 
-    public static final String EXCHANGE = RabbitMQConfig.EXCHANGE_EVENTS;
-    public static final String ROUTING_KEY = RabbitMQConfig.ROUTING_ORDER_STATUS_CHANGED;
+    public static final String EXCHANGE = MessagingTopology.EVENTS_EXCHANGE;
+    public static final String ROUTING_KEY = MessagingTopology.ORDER_STATUS_CHANGED_ROUTING_KEY;
 
     private final EventPublisher eventPublisher;
     private final Validator validator;

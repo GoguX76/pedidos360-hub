@@ -1,4 +1,4 @@
-package com.hub.pedidos360.orders.messaging;
+package com.hub.pedidos360.products.messaging.inventory;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

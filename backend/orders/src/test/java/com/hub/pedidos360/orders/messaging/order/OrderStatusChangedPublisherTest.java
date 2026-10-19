@@ -1,6 +1,7 @@
-package com.hub.pedidos360.orders.messaging;
+package com.hub.pedidos360.orders.messaging.order;
 
-import com.hub.pedidos360.orders.config.RabbitMQConfig;
+import com.hub.pedidos360.messaging.MessagingTopology;
+import com.hub.pedidos360.orders.messaging.EventPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderStatus;
@@ -55,8 +56,8 @@ class OrderStatusChangedPublisherTest {
 
         ArgumentCaptor<OrderStatusChangedEvent> captor = ArgumentCaptor.forClass(OrderStatusChangedEvent.class);
         verify(eventPublisher, times(1)).publish(
-                eq(RabbitMQConfig.EXCHANGE_EVENTS),
-                eq(RabbitMQConfig.ROUTING_ORDER_STATUS_CHANGED),
+                eq(MessagingTopology.EVENTS_EXCHANGE),
+                eq(MessagingTopology.ORDER_STATUS_CHANGED_ROUTING_KEY),
                 captor.capture()
         );
 

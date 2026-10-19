@@ -1,4 +1,4 @@
-package com.hub.pedidos360.orders.messaging;
+package com.hub.pedidos360.orders.messaging.order;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

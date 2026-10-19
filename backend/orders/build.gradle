@@ -27,6 +27,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	// Topologia/retry/DLQ compartidos (ver backend/common-messaging).
+	implementation 'com.hub.pedidos360:common-messaging'
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.projectlombok:lombok'

@@ -22,17 +22,17 @@
         Inicio
       </a>
       @if (authService.isAdmin()) {
-        <div class="relative" (clickOutside)="adminMenuOpen = false">
+        <div class="relative" (clickOutside)="closeAdminMenu()">
           <button
             type="button"
-            (click)="adminMenuOpen = !adminMenuOpen"
+            (click)="toggleAdminMenu()"
             class="inline-flex items-center gap-2 rounded-lg border border-ember/40 bg-ember/10 px-4 py-2 text-sm font-semibold text-ember transition-colors hover:bg-ember/20"
           >
             <i class="ti ti-settings text-base" aria-hidden="true"></i>
             Admin
             <i class="ti ti-chevron-down text-xs" aria-hidden="true"></i>
           </button>
-          @if (adminMenuOpen) {
+          @if (adminMenuOpen()) {
             <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-surface p-2 shadow-xl shadow-black/40">
               <button
                 type="button"

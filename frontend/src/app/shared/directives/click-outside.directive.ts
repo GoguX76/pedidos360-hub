@@ -10,8 +10,9 @@ export class ClickOutsideDirective {
   constructor(private elementRef: ElementRef) {}
 
   @HostListener('document:click', ['$event.target'])
-  onClick(target: HTMLElement): void {
-    if (!this.elementRef.nativeElement.contains(target)) {
+  onClick(target: EventTarget | null): void {
+    const host = this.elementRef.nativeElement as Node;
+    if (target instanceof Node && !host.contains(target)) {
       this.clickOutside.emit();
     }
   }

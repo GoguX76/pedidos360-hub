@@ -6,5 +6,5 @@ import { MenuComponent } from './features/menu/menu';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'menu', component: MenuComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' }
+  { path: '', redirectTo: 'menu', pathMatch: 'full' }
 ];

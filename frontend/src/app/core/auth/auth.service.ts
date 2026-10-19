@@ -33,6 +33,12 @@ export class AuthService implements OnDestroy {
     public userName = signal<string | null>(null);
 
     /**
+     * Indica si el usuario tiene rol de administrador.
+     * Se deriva del claim "roles" del token de Entra ID.
+     */
+    public isAdmin = signal<boolean>(false);
+
+    /**
      * Subject interno usado únicamente para cancelar las suscripciones
      * de este servicio en `ngOnDestroy`, evitando fugas de memoria.
      */
@@ -58,6 +64,8 @@ export class AuthService implements OnDestroy {
                 const accounts = this.msalService.instance.getAllAccounts();
                 this.authenticatedUser.set(accounts.length > 0);
                 this.userName.set(accounts[0]?.name ?? null);
+                const roles = (accounts[0]?.idTokenClaims?.['roles'] as string[]) ?? [];
+                this.isAdmin.set(roles.includes('admin'));
             });
 
         this.msalBroadcastService.msalSubject$

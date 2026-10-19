@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderItemRequest {
 
+    @NotNull(message = "El id del producto es obligatorio")
+    private Long productId;
+
     @NotBlank(message = "El nombre del producto es obligatorio")
     private String productName;
 

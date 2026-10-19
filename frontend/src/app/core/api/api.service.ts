@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import type { Product } from './models/product.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   /**
@@ -11,12 +12,11 @@ export class ApiService {
    * lo proxea en dev vía proxy.conf.json). Así no hay CORS: el navegador
    * nunca hace preflight contra otro origen.
    */
-  private readonly base =
-    typeof window !== 'undefined' ? window.location.origin : '';
+  private readonly base = typeof window !== 'undefined' ? window.location.origin : '';
 
   constructor(private http: HttpClient) {}
 
-  public getProducts(): Observable<any> {
-    return this.http.get(`${this.base}/api/v1/products`);
+  public getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.base}/api/v1/products`);
   }
 }

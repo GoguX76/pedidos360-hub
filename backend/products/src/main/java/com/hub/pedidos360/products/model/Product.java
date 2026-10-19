@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Product {
 
@@ -35,5 +34,10 @@ public class Product {
     private String category;
 
     @Column(nullable = false)
-    private boolean available = true;
+    private boolean available;
+
+    /** Por defecto, un producto nuevo se crea como disponible. */
+    public Product() {
+        this.available = true;
+    }
 }

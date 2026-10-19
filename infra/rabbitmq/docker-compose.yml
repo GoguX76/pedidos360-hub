@@ -1,0 +1,96 @@
+name: pedidos360-rabbitmq
+
+services:
+  rabbit1:
+    image: rabbitmq:4-management
+    hostname: rabbit1
+    container_name: rabbit1
+    restart: unless-stopped
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbit1_data:/var/lib/rabbitmq
+    networks:
+      - rabbitnet
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  rabbit2:
+    image: rabbitmq:4-management
+    hostname: rabbit2
+    container_name: rabbit2
+    restart: unless-stopped
+    depends_on:
+      rabbit1:
+        condition: service_healthy
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "5673:5672"
+    volumes:
+      - rabbit2_data:/var/lib/rabbitmq
+    networks:
+      - rabbitnet
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  cluster-init:
+    image: rabbitmq:4-management
+    container_name: cluster-init
+    depends_on:
+      rabbit1:
+        condition: service_healthy
+      rabbit2:
+        condition: service_healthy
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+    networks:
+      - rabbitnet
+    entrypoint:
+      - bash
+      - -c
+      - |
+        echo "Esperando a que rabbit1 y rabbit2 esten completamente listos..."
+        until rabbitmq-diagnostics -n rabbit@rabbit1 -q ping && rabbitmq-diagnostics -n rabbit@rabbit2 -q ping; do
+          sleep 2
+        done
+        echo "Ambos nodos estan respondiendo."
+
+        echo "Verificando si rabbit2 ya pertenece al cluster de rabbit1..."
+        if rabbitmqctl -n rabbit@rabbit2 cluster_status | grep -q "rabbit@rabbit1"; then
+          echo "rabbit2 ya forma parte del cluster con rabbit1. No se requiere accion."
+        else
+          echo "Uniendo rabbit2 al cluster..."
+          rabbitmqctl -n rabbit@rabbit2 stop_app
+          rabbitmqctl -n rabbit@rabbit2 reset
+          rabbitmqctl -n rabbit@rabbit2 join_cluster rabbit@rabbit1
+          rabbitmqctl -n rabbit@rabbit2 start_app
+          echo "Cluster unido exitosamente!"
+        fi
+
+        echo "Estado consolidado del cluster:"
+        rabbitmqctl -n rabbit@rabbit1 cluster_status
+
+networks:
+  rabbitnet:
+    name: rabbitnet
+    driver: bridge
+
+volumes:
+  rabbit1_data:
+  rabbit2_data:

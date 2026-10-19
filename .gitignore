@@ -20,3 +20,8 @@ contexto-caso/
 
 # lo que tengo que hacer
 Lo que tengo que hacer.txt
+
+# Secreto: archivo .env real (la plantilla .env.example SÍ se versiona)
+**/.env
+
+handoff-tarea3-rabbitmq

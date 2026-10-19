@@ -6,6 +6,9 @@ import com.hub.pedidos360.orders.model.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 
@@ -15,4 +18,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByBranchId(Long branchId);
     List<Order> findByStatus(OrderStatus status);
     List<Order> findByDispatchType(DispatchType dispatchType);
+    Page<Order> findAll(Pageable pageable);
 }

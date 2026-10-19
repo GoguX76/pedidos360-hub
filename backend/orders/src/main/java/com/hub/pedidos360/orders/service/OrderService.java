@@ -4,12 +4,17 @@ import com.hub.pedidos360.orders.dto.OrderItemRequest;
 import com.hub.pedidos360.orders.dto.OrderItemResponse;
 import com.hub.pedidos360.orders.dto.OrderRequest;
 import com.hub.pedidos360.orders.dto.OrderResponse;
+import com.hub.pedidos360.messaging.AfterCommitExecutor;
+import com.hub.pedidos360.orders.messaging.order.OrderCreatedPublisher;
+import com.hub.pedidos360.orders.messaging.order.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
 import com.hub.pedidos360.orders.model.Order;
 import com.hub.pedidos360.orders.model.OrderItem;
 import com.hub.pedidos360.orders.model.OrderStatus;
 import com.hub.pedidos360.orders.repository.OrderRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +27,18 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    private final OrderRepository orderRepository;
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
-    public OrderService(OrderRepository orderRepository) {
+    private final OrderRepository orderRepository;
+    private final OrderCreatedPublisher orderCreatedPublisher;
+    private final OrderStatusChangedPublisher orderStatusChangedPublisher;
+
+    public OrderService(OrderRepository orderRepository,
+                        OrderCreatedPublisher orderCreatedPublisher,
+                        OrderStatusChangedPublisher orderStatusChangedPublisher) {
         this.orderRepository = orderRepository;
+        this.orderCreatedPublisher = orderCreatedPublisher;
+        this.orderStatusChangedPublisher = orderStatusChangedPublisher;
     }
 
     /**
@@ -48,6 +61,7 @@ public class OrderService {
 
         for (OrderItemRequest itemRequest : request.getItems()) {
             OrderItem item = new OrderItem();
+            item.setProductId(itemRequest.getProductId());
             item.setProductName(itemRequest.getProductName());
             item.setQuantity(itemRequest.getQuantity());
             item.setUnitPrice(itemRequest.getUnitPrice());
@@ -63,6 +77,7 @@ public class OrderService {
         order.setTotalAmount(total);
 
         Order saved = orderRepository.save(order);
+        publishAfterCommit(() -> orderCreatedPublisher.publish(saved));
         return toResponse(saved);
     }
 
@@ -119,6 +134,7 @@ public class OrderService {
      * listo o en reparto
      */
 
+    @Transactional
     public OrderResponse updateStatus(Long id, String newStatus) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new OrderNotFoundException(id));
@@ -126,8 +142,10 @@ public class OrderService {
         OrderStatus status = parseOrderStatus(newStatus);
         validateTransition(order.getStatus(), status);
 
+        OrderStatus previousStatus = order.getStatus();
         order.setStatus(status);
         Order saved = orderRepository.save(order);
+        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
         return toResponse(saved);
     }
 
@@ -135,7 +153,7 @@ public class OrderService {
      * Permite cancelar un pedido mediante su ID si este ya
      * fue creado
      */
-
+    @Transactional
     public OrderResponse cancel(Long id) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new OrderNotFoundException(id));
@@ -146,14 +164,31 @@ public class OrderService {
                 + "Estado actual: " + order.getStatus());
         }
 
+        OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
+        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
         return toResponse(saved);
     }
 
     public Page<OrderResponse> findAll(Pageable pageable) {
         return orderRepository.findAll(pageable)
             .map(this::toResponse);
+    }
+
+    /**
+     * Publica el evento recien cuando la transaccion hizo commit, para no
+     * notificar cambios que la base de datos podria revertir. Si el broker
+     * falla, se registra el error sin romper la operacion ya confirmada.
+     */
+    private void publishAfterCommit(Runnable publishAction) {
+        AfterCommitExecutor.afterCommit(() -> {
+            try {
+                publishAction.run();
+            } catch (RuntimeException e) {
+                log.error("No se pudo publicar el evento en el broker: {}", e.getMessage(), e);
+            }
+        });
     }
 
     /**

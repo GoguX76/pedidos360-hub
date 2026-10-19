@@ -1,0 +1,40 @@
+plugins {
+	id 'java-library'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.hub.pedidos360'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+repositories {
+	maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }
+	mavenCentral()
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'org.springframework.boot:spring-boot-dependencies:4.1.0'
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs << '-parameters'
+}
+
+dependencies {
+	// El broker y el contexto de Spring se proveen desde cada microservicio;
+	// aqui solo se declaran como API para poder compilar la topologia y el
+	// manejador de reintentos.
+	api 'org.springframework.amqp:spring-rabbit'
+	api 'org.springframework:spring-context'
+	api 'org.springframework:spring-tx'
+	api 'com.fasterxml.jackson.core:jackson-databind'
+
+	compileOnly 'org.slf4j:slf4j-api'
+}

@@ -15,6 +15,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ID del producto
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
     // Nombre del producto
     @Column(nullable = false)
     private String productName;

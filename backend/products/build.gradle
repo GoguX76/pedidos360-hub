@@ -14,6 +14,7 @@ java {
 }
 
 repositories {
+	maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }
 	mavenCentral()
 }
 
@@ -32,6 +33,10 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    // Topologia/retry/DLQ compartidos (ver backend/common-messaging).
+    implementation 'com.hub.pedidos360:common-messaging'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     
     annotationProcessor 'org.projectlombok:lombok'
     

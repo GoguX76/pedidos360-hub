@@ -1,18 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
-import { NavCard } from './nav-card';
+import { NavCardComponent } from './nav-card';
 
 describe('NavCard', () => {
-  let component: NavCard;
-  let fixture: ComponentFixture<NavCard>;
+  let component: NavCardComponent;
+  let fixture: ComponentFixture<NavCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavCard],
+      imports: [NavCardComponent],
+      providers: [provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NavCard);
+    fixture = TestBed.createComponent(NavCardComponent);
     component = fixture.componentInstance;
+    component.title = 'Productos';
     await fixture.whenStable();
   });
 

@@ -1,0 +1,64 @@
+<header class="sticky top-0 z-30 border-b border-white/10 bg-bg/85 backdrop-blur-md">
+  <div class="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+    <a routerLink="/login" class="flex items-center gap-2 text-ink no-underline">
+      <i class="ti ti-tools-kitchen-2 text-xl text-ember" aria-hidden="true"></i>
+      <span class="font-display text-lg font-bold tracking-tight">Pedidos360</span>
+    </a>
+
+    <nav class="hidden items-center gap-6 text-sm font-medium sm:flex">
+      <a
+        routerLink="/login"
+        routerLinkActive="text-ember"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-ink-muted transition-colors hover:text-ink"
+        >Inicio</a
+      >
+      <a routerLink="/menu" routerLinkActive="text-ember" class="text-ink-muted transition-colors hover:text-ink"
+        >Menú</a
+      >
+      <span class="flex items-center gap-2 text-ink-muted/60">
+        Pedidos
+        <span class="rounded-full border border-ink-muted/40 px-2 py-0.5 text-[0.6rem] uppercase tracking-wide"
+          >Próximamente</span
+        >
+      </span>
+    </nav>
+
+    <div class="relative">
+      @if (authService.authenticatedUser()) {
+        <button
+          type="button"
+          (click)="toggleUserMenu()"
+          class="flex items-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm font-semibold text-ink transition-colors hover:border-ember"
+        >
+          <i class="ti ti-user-circle text-base text-ember" aria-hidden="true"></i>
+          <span class="max-w-[10rem] truncate">{{ authService.userName() ?? 'Mi cuenta' }}</span>
+          <i class="ti ti-chevron-down text-xs opacity-70" aria-hidden="true"></i>
+        </button>
+
+        @if (showUserMenu()) {
+          <div
+            class="absolute right-0 top-full mt-2 w-44 rounded-xl border border-white/10 bg-surface p-1.5 shadow-xl shadow-black/40"
+          >
+            <button
+              type="button"
+              (click)="onLogoutClick()"
+              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
+            >
+              <i class="ti ti-logout text-base" aria-hidden="true"></i>
+              Cerrar sesión
+            </button>
+          </div>
+        }
+      } @else {
+        <button
+          type="button"
+          (click)="onLoginClick()"
+          class="rounded-lg bg-ember px-4 py-1.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover"
+        >
+          Iniciar sesión
+        </button>
+      }
+    </div>
+  </div>
+</header>

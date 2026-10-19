@@ -24,7 +24,8 @@
 set -euo pipefail
 
 # --- Configuracion (sobrescribible por entorno) ---
-KEY_PATH="${KEY_PATH:-C:/Users/Seba/Downloads/pedidos360.pem}"
+# Ruta a la llave SSH (.pem). Obligatoria: exporta KEY_PATH antes de correr.
+KEY_PATH="${KEY_PATH:?Exporta KEY_PATH con la ruta de tu llave .pem}"
 ADMIN_IP="${ADMIN_IP:-3.233.100.195}"
 REMOTE_DIR="/home/ec2-user"
 SPRING_PROFILES_ACTIVE="${SPRING_PROFILES_ACTIVE:-prod}"

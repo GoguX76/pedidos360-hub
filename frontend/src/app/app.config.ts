@@ -19,7 +19,8 @@ import {
   MSAL_GUARD_CONFIG,
   MSAL_INTERCEPTOR_CONFIG,
   MsalGuardConfiguration,
-  MsalInterceptorConfiguration
+  MsalInterceptorConfiguration,
+  ProtectedResourceScopes
 } from '@azure/msal-angular';
 
 import { routes } from './app.routes';
@@ -71,13 +72,28 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
  * en cada llamada HTTP hacia las URLs que definas aquí.
  */
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
-  const protectedResourceMap = new Map<string, Array<string> | null>();
+  const protectedResourceMap = new Map<
+    string,
+    Array<string | ProtectedResourceScopes> | null
+  >();
   const apiScope = 'api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user';
   // Mismo origen que la app (ver ApiService): el scope va contra la API
   // aunque la URL sea la del propio dominio, porque nginx proxea /api/*.
   const api = appOrigin();
 
-  protectedResourceMap.set(`${api}/api/v1/products*`, [apiScope]);
+  // Scopes POR MÉTODO: el listado de productos es público (GET permitido en
+  // el backend), así que se marca con `scopes: null` para que el interceptor
+  // NO intente adquirir un token. Si se protegiera el GET, al no haber sesión
+  // el interceptor dispararía un loginRedirect y el menú exigiría iniciar
+  // sesión (que es justo lo que NO debe pasar). Las escrituras sí requieren
+  // token, porque en el backend están restringidas a ROLE_ADMIN.
+  protectedResourceMap.set(`${api}/api/v1/products*`, [
+    { httpMethod: 'GET', scopes: null },
+    { httpMethod: 'POST', scopes: [apiScope] },
+    { httpMethod: 'PUT', scopes: [apiScope] },
+    { httpMethod: 'PATCH', scopes: [apiScope] },
+    { httpMethod: 'DELETE', scopes: [apiScope] }
+  ]);
 
   return {
     // Redirect (no Popup): el login usa redirect y los navegadores suelen

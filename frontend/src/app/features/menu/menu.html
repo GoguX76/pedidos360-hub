@@ -36,6 +36,7 @@
             <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-surface p-2 shadow-xl shadow-black/40">
               <button
                 type="button"
+                (click)="openProductForm()"
                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-2"
               >
                 <i class="ti ti-plus text-ember" aria-hidden="true"></i>
@@ -196,6 +197,156 @@
           </div>
         </article>
       }
+    </div>
+  }
+
+  <!-- Aviso de éxito tras crear un producto -->
+  @if (saveSuccess()) {
+    <div
+      class="mb-6 flex items-center gap-3 rounded-2xl border border-success/40 bg-success/10 px-4 py-3 text-sm text-success"
+    >
+      <i class="ti ti-circle-check text-lg" aria-hidden="true"></i>
+      {{ saveSuccess() }}
+    </div>
+  }
+
+  <!-- Modal: crear producto (solo admin) -->
+  @if (productFormOpen()) {
+    <div
+      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+      (click)="closeProductForm()"
+    >
+      <div
+        class="mt-10 w-full max-w-lg rounded-2xl border border-white/10 bg-surface p-6 shadow-2xl shadow-black/50"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="mb-5 flex items-center justify-between">
+          <h2 class="font-display text-xl font-bold text-ink">Crear producto</h2>
+          <button
+            type="button"
+            (click)="closeProductForm()"
+            class="rounded-lg p-1.5 text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
+            aria-label="Cerrar"
+          >
+            <i class="ti ti-x text-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <form class="flex flex-col gap-4" (submit)="saveProduct($event)">
+          <label class="flex flex-col gap-1.5">
+            <span class="text-sm font-semibold text-ink">Nombre *</span>
+            <input
+              type="text"
+              required
+              [value]="productDraft().name"
+              (input)="updateDraft('name', $any($event.target).value)"
+              placeholder="Ej: Torta de frambuesa"
+              class="rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted/60 focus:border-ember"
+            />
+          </label>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-sm font-semibold text-ink">Descripción</span>
+            <textarea
+              rows="2"
+              [value]="productDraft().description"
+              (input)="updateDraft('description', $any($event.target).value)"
+              placeholder="Breve descripción (opcional)"
+              class="resize-none rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted/60 focus:border-ember"
+            ></textarea>
+          </label>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="flex flex-col gap-1.5">
+              <span class="text-sm font-semibold text-ink">Precio (CLP) *</span>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                required
+                [value]="productDraft().price"
+                (input)="updateDraft('price', $any($event.target).value)"
+                placeholder="0"
+                class="rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted/60 focus:border-ember"
+              />
+            </label>
+
+            <label class="flex flex-col gap-1.5">
+              <span class="text-sm font-semibold text-ink">Stock *</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                required
+                [value]="productDraft().stock"
+                (input)="updateDraft('stock', $any($event.target).value)"
+                placeholder="0"
+                class="rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted/60 focus:border-ember"
+              />
+            </label>
+          </div>
+
+          <label class="flex flex-col gap-1.5">
+            <span class="text-sm font-semibold text-ink">Categoría *</span>
+            <input
+              type="text"
+              required
+              list="product-categories"
+              [value]="productDraft().category"
+              (input)="updateDraft('category', $any($event.target).value)"
+              placeholder="Ej: Pastelería"
+              class="rounded-lg border border-white/10 bg-surface-2 px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted/60 focus:border-ember"
+            />
+            <datalist id="product-categories">
+              @for (option of categoryOptions(); track option.id) {
+                <option [value]="option.name"></option>
+              }
+            </datalist>
+          </label>
+
+          <label class="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              [checked]="productDraft().available"
+              (change)="updateDraft('available', $any($event.target).checked)"
+              class="h-4 w-4 accent-ember"
+            />
+            Disponible para la venta
+          </label>
+
+          @if (formError()) {
+            <p
+              class="flex items-center gap-2 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger"
+            >
+              <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+              {{ formError() }}
+            </p>
+          }
+
+          <div class="mt-2 flex justify-end gap-2">
+            <button
+              type="button"
+              (click)="closeProductForm()"
+              class="rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-ember"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="savingProduct()"
+              class="inline-flex items-center gap-2 rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover disabled:opacity-60"
+            >
+              @if (savingProduct()) {
+                <i class="ti ti-loader-2 animate-spin" aria-hidden="true"></i>
+                Guardando…
+              } @else {
+                <i class="ti ti-device-floppy" aria-hidden="true"></i>
+                Guardar producto
+              }
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   }
 </div>

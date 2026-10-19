@@ -13,13 +13,53 @@
         }
       </p>
     </div>
-    <a
-      routerLink="/login"
-      class="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-ink no-underline transition-colors hover:border-ember"
-    >
-      <i class="ti ti-arrow-left text-base" aria-hidden="true"></i>
-      Inicio
-    </a>
+    <div class="flex items-center gap-2">
+      <a
+        routerLink="/login"
+        class="inline-flex items-center gap-2 rounded-lg border border-white/15 px-4 py-2 text-sm font-semibold text-ink no-underline transition-colors hover:border-ember"
+      >
+        <i class="ti ti-arrow-left text-base" aria-hidden="true"></i>
+        Inicio
+      </a>
+      @if (authService.isAdmin()) {
+        <div class="relative" (clickOutside)="adminMenuOpen = false">
+          <button
+            type="button"
+            (click)="adminMenuOpen = !adminMenuOpen"
+            class="inline-flex items-center gap-2 rounded-lg border border-ember/40 bg-ember/10 px-4 py-2 text-sm font-semibold text-ember transition-colors hover:bg-ember/20"
+          >
+            <i class="ti ti-settings text-base" aria-hidden="true"></i>
+            Admin
+            <i class="ti ti-chevron-down text-xs" aria-hidden="true"></i>
+          </button>
+          @if (adminMenuOpen) {
+            <div class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-surface p-2 shadow-xl shadow-black/40">
+              <button
+                type="button"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-2"
+              >
+                <i class="ti ti-plus text-ember" aria-hidden="true"></i>
+                Crear producto
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-2"
+              >
+                <i class="ti ti-list text-ember" aria-hidden="true"></i>
+                Ver pedidos
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink transition-colors hover:bg-surface-2"
+              >
+                <i class="ti ti-server text-ember" aria-hidden="true"></i>
+                Administrar RabbitMQ
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </header>
 
   <!-- Barra de filtros -->

@@ -25,3 +25,6 @@ Lo que tengo que hacer.txt
 **/.env
 
 handoff-tarea3-rabbitmq
+
+# Git worktree artifacts
+.delta/

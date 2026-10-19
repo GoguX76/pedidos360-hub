@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal, type OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ClickOutsideDirective } from '../../shared/directives/click-outside.directive';
 import { AuthService } from '../../core/auth/auth.service';
 import { ApiService } from '../../core/api/api.service';
 import type { Product } from '../../core/api/models/product.model';
@@ -21,7 +22,7 @@ type StockLevel = 'out' | 'low' | 'ok';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ClickOutsideDirective],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -42,6 +43,9 @@ export class MenuComponent implements OnInit {
   protected search = signal('');
   protected categoryFilter = signal('todas');
   protected onlyAvailable = signal(false);
+
+  // Menú de administrador.
+  protected adminMenuOpen = signal(false);
 
   /** Opciones del selector: categorías destacadas + las que traiga la API. */
   protected readonly categoryOptions = computed(() => {

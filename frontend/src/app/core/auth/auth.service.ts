@@ -80,6 +80,8 @@ export class AuthService implements OnDestroy {
                 this.authenticatedUser.set(true);
                 const accounts = this.msalService.instance.getAllAccounts();
                 this.userName.set(accounts[0]?.name ?? null);
+                const roles = (accounts[0]?.idTokenClaims?.['roles'] as string[]) ?? [];
+                this.isAdmin.set(roles.includes('admin'));
             });
     }
 
@@ -102,6 +104,7 @@ export class AuthService implements OnDestroy {
         this.msalService.logoutRedirect();
         this.authenticatedUser.set(false);
         this.userName.set(null);
+        this.isAdmin.set(false);
     }
 
     ngOnDestroy(): void {

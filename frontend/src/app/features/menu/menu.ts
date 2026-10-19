@@ -121,6 +121,16 @@ export class MenuComponent implements OnInit {
     this.onlyAvailable.update((value) => !value);
   }
 
+  /** Abre/cierra el menú contextual de administrador. */
+  protected toggleAdminMenu(): void {
+    this.adminMenuOpen.update((open) => !open);
+  }
+
+  /** Cierra el menú de administrador (al hacer clic fuera). */
+  protected closeAdminMenu(): void {
+    this.adminMenuOpen.set(false);
+  }
+
   protected clearFilters(): void {
     this.search.set('');
     this.categoryFilter.set('todas');

@@ -14,6 +14,24 @@ import {
 type StockLevel = 'out' | 'low' | 'ok';
 
 /**
+ * Borrador del formulario de creación. precio/stock se guardan como texto
+ * para no perder lo que el usuario escribe (se convierten al enviar).
+ */
+interface ProductDraft {
+  name: string;
+  description: string;
+  price: string;
+  stock: string;
+  category: string;
+  available: boolean;
+}
+
+/** Borrador vacío (producto nuevo, disponible por defecto). */
+function emptyDraft(): ProductDraft {
+  return { name: '', description: '', price: '', stock: '', category: '', available: true };
+}
+
+/**
  * Página de Menú/Productos. Carga el catálogo desde la API y lo muestra
  * en una grilla de tarjetas con buscador, filtro por categoría y un
  * toggle de "solo disponibles". Acepta `?categoria=<slug>` para llegar
@@ -46,6 +64,13 @@ export class MenuComponent implements OnInit {
 
   // Menú de administrador.
   protected adminMenuOpen = signal(false);
+
+  // Formulario de "crear producto" (solo admin).
+  protected productFormOpen = signal(false);
+  protected productDraft = signal<ProductDraft>(emptyDraft());
+  protected savingProduct = signal(false);
+  protected formError = signal('');
+  protected saveSuccess = signal('');
 
   /** Opciones del selector: categorías destacadas + las que traiga la API. */
   protected readonly categoryOptions = computed(() => {
@@ -131,6 +156,81 @@ export class MenuComponent implements OnInit {
     this.adminMenuOpen.set(false);
   }
 
+  /** Abre el formulario de creación de producto con los campos en blanco. */
+  protected openProductForm(): void {
+    this.adminMenuOpen.set(false);
+    this.saveSuccess.set('');
+    this.formError.set('');
+    this.productDraft.set(emptyDraft());
+    this.productFormOpen.set(true);
+  }
+
+  /** Cierra el formulario (sin guardar). */
+  protected closeProductForm(): void {
+    this.productFormOpen.set(false);
+  }
+
+  /** Actualiza un campo del borrador. */
+  protected updateDraft(field: keyof ProductDraft, value: string | boolean): void {
+    this.productDraft.update((draft) => ({ ...draft, [field]: value }));
+  }
+
+  /**
+   * Valida el borrador y crea el producto vía `POST /api/v1/products`.
+   * Al éxito recarga el catálogo para que aparezca el producto nuevo.
+   */
+  protected saveProduct(event?: Event): void {
+    event?.preventDefault();
+
+    const draft = this.productDraft();
+    const name = draft.name.trim();
+    const category = draft.category.trim();
+    const price = Number(draft.price);
+    const stock = Number(draft.stock);
+
+    if (!name) {
+      this.formError.set('El nombre es obligatorio.');
+      return;
+    }
+    if (!category) {
+      this.formError.set('La categoría es obligatoria.');
+      return;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      this.formError.set('El precio debe ser un número mayor a 0.');
+      return;
+    }
+    if (!Number.isInteger(stock) || stock < 0) {
+      this.formError.set('El stock debe ser un número entero mayor o igual a 0.');
+      return;
+    }
+
+    this.savingProduct.set(true);
+    this.formError.set('');
+
+    this.apiService
+      .createProduct({
+        name,
+        description: draft.description.trim() || null,
+        price,
+        stock,
+        category,
+        available: draft.available,
+      })
+      .subscribe({
+        next: () => {
+          this.savingProduct.set(false);
+          this.productFormOpen.set(false);
+          this.saveSuccess.set(`Producto "${name}" creado correctamente.`);
+          this.load();
+        },
+        error: (err) => {
+          this.savingProduct.set(false);
+          this.formError.set(this.readError(err));
+        },
+      });
+  }
+
   protected clearFilters(): void {
     this.search.set('');
     this.categoryFilter.set('todas');
@@ -171,6 +271,9 @@ export class MenuComponent implements OnInit {
   /** Convierte un error HTTP/JS en un texto corto para mostrar al usuario. */
   private readError(err: unknown): string {
     const e = err as { status?: number; message?: string } | null;
+    if (e?.status === 401) return 'Tu sesión no está autenticada (401).';
+    if (e?.status === 403) return 'No tienes permisos de administrador (403).';
+    if (e?.status === 400) return 'Datos inválidos (400). Revisa los campos.';
     return e?.status ? `HTTP ${e.status}` : (e?.message ?? 'Error desconocido');
   }
 }

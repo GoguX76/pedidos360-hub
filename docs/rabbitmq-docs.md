@@ -46,7 +46,9 @@ StockLowPublisher (products) → q.stock-low
 ## Configuración
 
 `RabbitTopologyConfig` (módulo compartido `common-messaging`) declara exchanges, colas y bindings como beans de Spring.
-Los nombres están centralizados en `MessagingTopology` y cada microservicio habilita la configuración con `@Import(RabbitTopologyConfig.class)`, de modo que la topología se declara **una sola vez** y no hay copias que puedan divergir.
+Los nombres están centralizados en `MessagingTopology` y los microservicios de negocio (`orders` y `products`) habilitan la configuración con `@Import(RabbitTopologyConfig.class)`, de modo que la topología se declara **una sola vez** y no hay copias que puedan divergir.
+
+El microservicio `rabbitmq-admin` **no** consume este módulo: es un inspector del broker que expone por REST la creación y eliminación de colas, exchanges y bindings por nombre, sin declarar la topología.
 
 ## Consumidores
 

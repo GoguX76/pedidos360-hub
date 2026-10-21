@@ -36,18 +36,20 @@ StockLowPublisher (products) → q.stock-low
 
 ## Características
 
-- **ACK manual**: `channel.basicAck()` / `channel.basicReject()`
-- **DLQ**: mensajes rechazados van a la cola de dead letters
+- **ACK manual**: `channel.basicAck()` / `channel.basicReject()`, con `spring.rabbitmq.listener.simple.acknowledge-mode=manual`
+- **Reintentos**: hasta `app.messaging.retry.max-attempts` (3) reintentos, con el contador en el header `x-retry-count`
+- **DLQ**: al agotar los reintentos, `basicReject` sin requeue deriva el mensaje a la cola de dead letters
 - **Validación**: eventos validados con `Validator` antes de publicar
 - **JSON**: `JacksonJsonMessageConverter` con type precedence
 - **Cluster**: 2 nodos (`rabbit1`, `rabbit2`) en Docker Compose
 
 ## Configuración
 
-`RabbitMQConfig.java` declara exchanges, colas y bindings como beans de Spring.
-Cada microservicio tiene su propia copia de la configuración.
+`RabbitTopologyConfig` (módulo compartido `common-messaging`) declara exchanges, colas y bindings como beans de Spring.
+Los nombres están centralizados en `MessagingTopology` y cada microservicio habilita la configuración con `@Import(RabbitTopologyConfig.class)`, de modo que la topología se declara **una sola vez** y no hay copias que puedan divergir.
 
 ## Consumidores
 
 - `OrderCreatedConsumer` (products): valida el evento, descuenta stock, ACK explícito
-- Si el procesamiento falla: `basicReject` sin requeue → mensaje va a DLQ
+- Si el procesamiento falla y el error es recuperable, el mensaje se reencola con `x-retry-count` incrementado y se reintenta
+- Si el error es no recuperable (DTO inválido, producto inexistente, stock insuficiente) o se agotan los reintentos, `basicReject` sin requeue → mensaje va a DLQ

@@ -2,11 +2,13 @@ package com.hub.pedidos360.messaging;
 
 /**
  * Fuente unica de nombres de la topologia de mensajeria (exchanges, colas y
- * routing keys) compartida por todos los microservicios.
+ * routing keys) compartida por los microservicios de negocio.
  *
  * <p>Antes cada servicio declaraba su propia copia de estos nombres; ahora se
- * importan desde este modulo comun para evitar divergencias entre orders,
- * products y rabbitmq-admin.</p>
+ * importan desde este modulo comun para evitar divergencias entre orders y
+ * products. El microservicio {@code rabbitmq-admin} no participa: es un
+ * inspector del broker que administra exchanges, colas y bindings por nombre en
+ * runtime, sin declarar la topologia.</p>
  */
 public final class MessagingTopology {
 

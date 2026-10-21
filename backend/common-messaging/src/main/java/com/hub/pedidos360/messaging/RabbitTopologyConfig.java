@@ -13,12 +13,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Topologia completa del broker declarada una sola vez y reutilizada por todos
- * los servicios (separada de la logica de negocio).
+ * Topologia completa del broker declarada una sola vez y reutilizada por los
+ * microservicios de negocio (separada de la logica de negocio).
  *
- * <p>Cada microservicio la habilita con {@code @Import(RabbitTopologyConfig.class)};
- * como vive en un paquete distinto al de la aplicacion, no se toma por
- * component-scan accidental.</p>
+ * <p>Los servicios que publican o consumen (orders y products) la habilitan con
+ * {@code @Import(RabbitTopologyConfig.class)}; como vive en un paquete distinto
+ * al de la aplicacion, no se toma por component-scan accidental. El
+ * microservicio {@code rabbitmq-admin} no la importa: inspecciona el broker por
+ * REST sin declarar la topologia.</p>
  */
 @Configuration
 public class RabbitTopologyConfig {

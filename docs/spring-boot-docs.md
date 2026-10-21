@@ -16,7 +16,7 @@ Spring Boot 4.1.0 con Java 25.
 
 ```
 src/main/java/com/hub/pedidos360/<servicio>/
-├── config/           # SecurityConfig, JwtDecoderConfig, RabbitMQConfig
+├── config/           # SecurityConfig, JwtDecoderConfig, MessagingConfig
 ├── controller/       # REST controllers
 ├── service/          # Lógica de negocio
 ├── repository/       # JPA repositories

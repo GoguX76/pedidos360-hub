@@ -22,8 +22,8 @@
 Los Security Groups permiten tráfico entre las instancias:
 
 ```
-EC2 #1 (orders)     → EC2 #3 (RabbitMQ):5672
-EC2 #2 (products)   → EC2 #3 (RabbitMQ):5672
+EC2 #1 (orders)     → EC2 #4 (RabbitMQ):5672
+EC2 #2 (products)   → EC2 #4 (RabbitMQ):5672
 Frontend (navegador) → API Gateway → EC2 #1, EC2 #2
 ```
 

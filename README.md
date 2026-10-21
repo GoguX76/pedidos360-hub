@@ -76,6 +76,10 @@ docker compose up -d
 * **Microservicio administrador** (`rabbitmq-admin`) con creación y eliminación de colas, exchanges y bindings en `/api/v1/admin`.
 * **ACK manual + reintentos + DLQ** en los consumidores (`acknowledge-mode=manual` y `MessageRetryHandler`).
 * **`docker compose`** levanta el broker y los nodos en la nube.
+* **Configuraciones centralizadas**: `common-messaging` declara la topología una sola vez (`RabbitTopologyConfig` + `MessagingTopology`) y `orders`/`products` la habilitan con `@Import`; no hay copias que puedan divergir.
+* **Una clase por caso de uso y clases aisladas del negocio**: publicadores, consumidores, topología y política de reintentos viven en paquetes `messaging/`, separados de `service/`.
+* **El broker se usa como un servicio**: corre en su propia EC2, en un clúster de 2 nodos, y los microservicios se conectan por AMQP sin conocer su implementación.
+* **Validación con DTO**: los eventos se validan con `Validator` (Jakarta Validation) antes de procesarse, y por AMQP viajan DTOs, no entidades JPA.
 
 ## Documentación técnica
 

@@ -5,52 +5,30 @@ import { MsalBroadcastService } from "@azure/msal-angular";
 import { EventType, InteractionStatus } from "@azure/msal-browser";
 import { Subject, filter, takeUntil } from "rxjs";
 
-/**
- * Servicio encargado de gestionar la autenticación del usuario mediante
- * Microsoft Entra ID (MSAL), y de exponer su estado de sesión al resto
- * de la aplicación a través de un signal reactivo.
- *
- * @remarks
- * Este servicio escucha los eventos de MSAL en su constructor para
- * mantener `authenticatedUser` sincronizado automáticamente, en vez de
- * que cada componente tenga que consultar el estado de login por su cuenta.
- */
+/** Gestiona la autenticación y expone el estado de sesión de MSAL. */
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService implements OnDestroy {
-    /**
-     * Indica si el usuario tiene una sesión activa.
-     * Los componentes deben leer este signal (no consultar MSAL directamente)
-     * para decidir qué mostrar en pantalla (ej. botón de login vs. datos del usuario).
-     */
+    /** Indica si existe una sesión activa. */
     public authenticatedUser = signal<boolean>(false);
 
-    /**
-     * Nombre del usuario autenticado (viene de la cuenta de MSAL).
-     * null si no hay sesión activa.
-     */
+    /** Nombre del usuario autenticado, o null si no existe sesión. */
     public userName = signal<string | null>(null);
 
-    /**
-     * Indica si el usuario tiene rol de administrador.
-     * Se deriva del claim "roles" del token de Entra ID.
-     */
+    /** Identificador único del usuario autenticado, o null si no existe */
+    public userId = signal<string | null>(null);
+
+    /** Indica si el usuario tiene el rol de administrador. */
     public isAdmin = signal<boolean>(false);
 
-    /**
-     * Subject interno usado únicamente para cancelar las suscripciones
-     * de este servicio en `ngOnDestroy`, evitando fugas de memoria.
-     */
+    /** Cancela las suscripciones al destruir el servicio. */
     private destroy$ = new Subject<void>();
 
     constructor(
         private msalService: MsalService,
         private msalBroadcastService: MsalBroadcastService
     ) {
-        // MSAL requiere procesar la respuesta de Azure AD apenas el usuario
-        // vuelve de la pantalla de login (contiene el código de autorización
-        // en la URL). Sin esta suscripción, esa respuesta nunca se procesa.
         this.msalService.handleRedirectObservable()
         .pipe(takeUntil(this.destroy$))
         .subscribe();
@@ -61,52 +39,51 @@ export class AuthService implements OnDestroy {
                 takeUntil(this.destroy$)
             )
             .subscribe(() => {
-                const accounts = this.msalService.instance.getAllAccounts();
-                this.authenticatedUser.set(accounts.length > 0);
-                this.userName.set(accounts[0]?.name ?? null);
-                const roles = (accounts[0]?.idTokenClaims?.['roles'] as string[]) ?? [];
-                this.isAdmin.set(roles.includes('admin'));
+                this.syncAccountState();
             });
 
         this.msalBroadcastService.msalSubject$
             .pipe(
-                // Filtramos porque msalSubject$ emite TODOS los eventos de MSAL
-                // (inicio de login, error, logout, etc.), y solo nos interesa
-                // reaccionar cuando el login se completó con éxito.
                 filter((msg) => msg.eventType === EventType.LOGIN_SUCCESS),
                 takeUntil(this.destroy$)
             )
             .subscribe(() => {
-                this.authenticatedUser.set(true);
-                const accounts = this.msalService.instance.getAllAccounts();
-                this.userName.set(accounts[0]?.name ?? null);
-                const roles = (accounts[0]?.idTokenClaims?.['roles'] as string[]) ?? [];
-                this.isAdmin.set(roles.includes('admin'));
+                this.syncAccountState();
             });
     }
 
     /**
-     * Inicia el flujo de login redirigiendo al usuario hacia la pantalla
-     * de autenticación de Microsoft Entra ID.
-     *
-     * @remarks
-     * Usa redirect (no popup) porque la app está registrada como SPA
-     * con ese flujo en Azure AD.
+     * Actualiza el estado de sesión a partir de la cuenta activa
      */
+    private syncAccountState(): void {
+        const account = this.msalService.instance.getAllAccounts()[0];
+
+        this.authenticatedUser.set(Boolean(account));
+        this.userName.set(account?.name ?? null);
+
+        const userId = account?.idTokenClaims?.['oid'];
+
+        this.userId.set(typeof userId === 'string' ? userId : null);
+
+        const roles = (account?.idTokenClaims?.['roles'] as string[]) ?? [];
+        this.isAdmin.set(roles.includes('admin'));
+    }
+
+    /** Inicia el login mediante redirección a Microsoft Entra ID. */
     public login(): void {
         this.msalService.loginRedirect();
     }
 
-    /**
-     * Cierra la sesión del usuario tanto en la aplicación como en Azure AD.
-     */
+    /** Cierra la sesión local y la sesión de Microsoft Entra ID. */
     public logOut(): void {
         this.msalService.logoutRedirect();
         this.authenticatedUser.set(false);
         this.userName.set(null);
+        this.userId.set(null);
         this.isAdmin.set(false);
     }
 
+    /** Libera las suscripciones del servicio. */
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

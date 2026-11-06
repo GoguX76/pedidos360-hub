@@ -181,8 +181,37 @@
               {{ product.stock }} en stock
             </span>
           </div>
+
+          <button
+            type="button"
+            (click)="addToCart(product)"
+            [disabled]="!product.available || product.stock <= 0"
+            class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <i class="ti ti-shopping-cart-plus text-base" aria-hidden="true"></i>
+            Agregar al carrito
+          </button>
         </article>
       }
+    </div>
+  }
+
+  @if (cartMessage()) {
+    <div
+      [class]="
+        'mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm ' +
+        (cartMessageIsError()
+          ? 'border-danger/40 bg-danger/10 text-danger'
+          : 'border-success/40 bg-success/10 text-success')
+      "
+    >
+      <i
+        class="ti ti-shopping-cart-check text-lg"
+        [class.text-danger]="cartMessageIsError()"
+        [class.text-success]="!cartMessageIsError()"
+        aria-hidden="true"
+      ></i>
+      {{ cartMessage() }}
     </div>
   }
 

@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ClickOutsideDirective } from '../../shared/directives/click-outside.directive';
 import { AuthService } from '../../core/auth/auth.service';
 import { ApiService } from '../../core/api/api.service';
+import { CartService } from '../../core/cart/cart.service';
 import type { Product } from '../../core/api/models/product.model';
 import {
   CATALOG_CATEGORIES,
@@ -47,6 +48,7 @@ function emptyDraft(): ProductDraft {
 export class MenuComponent implements OnInit {
   protected authService = inject(AuthService);
   protected apiService = inject(ApiService);
+  protected cartService = inject(CartService);
   private route = inject(ActivatedRoute);
 
   // Helpers expuestos a la plantilla.
@@ -56,6 +58,8 @@ export class MenuComponent implements OnInit {
   protected products = signal<Product[]>([]);
   protected loadingProducts = signal(true);
   protected errorProducts = signal('');
+  protected cartMessage = signal('');
+  protected cartMessageIsError = signal(false);
 
   // Filtros.
   protected search = signal('');
@@ -144,6 +148,21 @@ export class MenuComponent implements OnInit {
 
   protected toggleAvailable(): void {
     this.onlyAvailable.update((value) => !value);
+  }
+
+  /**
+   * Añade un producto al carrito de compras
+   * @param product Producto que se desea agregar
+   */
+  protected addToCart(product: Product): void {
+    const added = this.cartService.addProduct(product);
+    this.cartMessageIsError.set(!added);
+
+    this.cartMessage.set(
+      added
+        ? `${product.name} se agregó al carrito`
+        : `No se pudo agregar ${product.name}`,
+    );
   }
 
   /** Abre/cierra el menú contextual de administrador. */

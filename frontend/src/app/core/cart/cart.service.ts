@@ -119,7 +119,7 @@ export class CartService {
 
         if (existingItem.quantity > 1) {
             this.items.update((items) =>
-                items.map((item) => 
+                items.map((item) =>
                     item.product.id === productId
                     ? { ...item, quantity: item.quantity - 1 }
                     : item,
@@ -128,7 +128,7 @@ export class CartService {
 
             return true;
         }
-        
+
         return this.removeProduct(productId);
     }
 
@@ -150,7 +150,7 @@ export class CartService {
         this.items.update((items) =>
             items.filter((item) => item.product.id !== productId),
         );
-        
+
         return true;
     }
 

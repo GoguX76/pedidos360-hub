@@ -59,6 +59,7 @@ export class MenuComponent implements OnInit {
   protected loadingProducts = signal(true);
   protected errorProducts = signal('');
   protected cartMessage = signal('');
+  protected cartMessageIsError = signal(false);
 
   // Filtros.
   protected search = signal('');
@@ -155,6 +156,7 @@ export class MenuComponent implements OnInit {
    */
   protected addToCart(product: Product): void {
     const added = this.cartService.addProduct(product);
+    this.cartMessageIsError.set(!added);
 
     this.cartMessage.set(
       added

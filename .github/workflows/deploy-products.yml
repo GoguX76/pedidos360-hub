@@ -1,0 +1,69 @@
+name: Deploy products
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/products/**"
+      - "backend/common-messaging/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy-products
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy products
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Prepare SSH
+        env:
+          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          EC2_HOST: 50.16.89.8
+        run: |
+          set -euo pipefail
+          test -n "$EC2_SSH_PRIVATE_KEY" || {
+            echo "::error::Configure el secret EC2_SSH_PRIVATE_KEY."
+            exit 1
+          }
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$EC2_SSH_PRIVATE_KEY" > "$RUNNER_TEMP/ec2_key"
+          chmod 600 "$RUNNER_TEMP/ec2_key"
+          ssh-keyscan -H "$EC2_HOST" >> "$HOME/.ssh/known_hosts"
+
+      - name: Build and deploy products
+        working-directory: backend/products
+        env:
+          KEY_PATH: ${{ runner.temp }}/ec2_key
+          PRODUCTS_IP: 50.16.89.8
+          DB_URL: ${{ secrets.PRODUCTS_DB_URL }}
+          DB_USER: ${{ secrets.PRODUCTS_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PRODUCTS_DB_PASSWORD }}
+          RABBITMQ_HOST: ${{ secrets.PRODUCTS_RABBITMQ_HOST }}
+          RABBITMQ_PORT: ${{ secrets.PRODUCTS_RABBITMQ_PORT }}
+          RABBITMQ_USER: ${{ secrets.PRODUCTS_RABBITMQ_USER }}
+          RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in DB_URL DB_USER DB_PASSWORD RABBITMQ_HOST RABBITMQ_PORT RABBITMQ_USER RABBITMQ_PASS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Configure the secret mapped to $name for products."
+              exit 1
+            fi
+          done
+          chmod +x deploy-ec2.sh
+          ./deploy-ec2.sh

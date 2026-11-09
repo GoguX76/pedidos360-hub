@@ -1,0 +1,40 @@
+server:
+  port: 8084   # ajusta si choca con otro microservicio
+
+spring:
+  application:
+    name: kafka-admin
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # COPIA aqui los mismos valores que usa rabbitmq-admin (IDaaS).
+          jwk-set-uri: ${JWT_JWK_SET_URI:https://example.invalid/discovery/keys}
+          # issuer-uri: ${JWT_ISSUER_URI}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+kafka-admin:
+  timeout-seconds: 10
+  bootstrap-enabled: true          # crea estos topicos al arrancar si no existen
+  topics:                          # ajusta los nombres a los de KafkaTopics (common-messaging)
+    - name: pedidos.eventos
+      partitions: 3
+      replication-factor: 2
+      configs:
+        "[retention.ms]": "604800000"      # 7 dias
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "1"
+    - name: inventario.alertas
+      partitions: 2
+      replication-factor: 2
+      configs:
+        "[retention.ms]": "2592000000"     # 30 dias
+        "[cleanup.policy]": "compact"
+        "[min.insync.replicas]": "1"

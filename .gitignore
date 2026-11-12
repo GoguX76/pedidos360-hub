@@ -28,3 +28,6 @@ handoff-tarea3-rabbitmq
 
 # Git worktree artifacts
 .delta/
+
+#trabajo de kafka
+plan-implementacion-kafka-notificaciones

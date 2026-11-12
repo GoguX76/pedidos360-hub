@@ -42,6 +42,14 @@
                 <i class="ti ti-plus text-ember" aria-hidden="true"></i>
                 Crear producto
               </button>
+              <button
+                type="button"
+                (click)="toggleDeleteMode()"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-danger transition-colors hover:bg-surface-2"
+              >
+                <i class="ti ti-trash" aria-hidden="true"></i>
+                {{ deleteMode() ? 'Salir del modo eliminar' : 'Eliminar productos' }}
+              </button>
             </div>
           }
         </div>
@@ -92,6 +100,24 @@
       Solo disponibles
     </button>
   </div>
+
+  @if (deleteMode() || deleteMessage()) {
+    <div
+      [class]="
+        'mb-6 flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ' +
+        (deleteMessageIsError()
+          ? 'border-danger/40 bg-danger/10 text-danger'
+          : 'border-ember/30 bg-ember/10 text-ink')
+      "
+      role="status"
+    >
+      @if (deleteMessage()) {
+        {{ deleteMessage() }}
+      } @else {
+        Pulsa el icono de papelera en el producto que quieras quitar.
+      }
+    </div>
+  }
 
   @if (loadingProducts()) {
     <!-- Skeleton de carga -->
@@ -161,9 +187,9 @@
           </div>
 
           <h3 class="font-display text-lg font-bold leading-tight text-ink">{{ product.name }}</h3>
-          @if (product.description) {
-            <p class="mt-1 line-clamp-2 text-sm text-ink-muted">{{ product.description }}</p>
-          }
+          <p class="mt-1 min-h-10 line-clamp-2 text-sm text-ink-muted">
+            {{ product.description ?? '' }}
+          </p>
 
           <div class="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
             <span class="font-display text-xl font-bold text-ember">{{ price(product.price) }}</span>
@@ -182,15 +208,36 @@
             </span>
           </div>
 
-          <button
-            type="button"
-            (click)="addToCart(product)"
-            [disabled]="!product.available || product.stock <= 0"
-            class="mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <i class="ti ti-shopping-cart-plus text-base" aria-hidden="true"></i>
-            Agregar al carrito
-          </button>
+          <div class="mt-4 flex items-center gap-2">
+            <button
+              type="button"
+              (click)="addToCart(product)"
+              [disabled]="!product.available || product.stock <= 0"
+              class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <i class="ti ti-shopping-cart-plus text-base" aria-hidden="true"></i>
+              Agregar al carrito
+            </button>
+            @if (authService.isAdmin() && deleteMode()) {
+              <button
+                type="button"
+                (click)="deleteProduct(product)"
+                [disabled]="deletingProductId() !== null"
+                [attr.aria-label]="'Eliminar ' + product.name"
+                [attr.title]="'Eliminar ' + product.name"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-danger/40 bg-danger/10 p-2.5 text-danger transition-colors hover:bg-danger/20 disabled:cursor-wait disabled:opacity-60"
+              >
+                <i
+                  [class]="
+                    deletingProductId() === product.id
+                      ? 'ti ti-loader-2 animate-spin'
+                      : 'ti ti-trash'
+                  "
+                  aria-hidden="true"
+                ></i>
+              </button>
+            }
+          </div>
         </article>
       }
     </div>

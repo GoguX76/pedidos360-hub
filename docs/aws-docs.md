@@ -14,7 +14,7 @@
 |---|---|---|
 | EC2 #1 | `orders` | 8081 |
 | EC2 #2 | `products` | 8082 |
-| EC2 #3 | `frontend` | 8080 |
+| EC2 #3 | `frontend` (Nginx) | 80, 443 |
 | EC2 #4 | RabbitMQ (Docker) | 5672, 15672 |
 
 ## Conexión entre instancias
@@ -32,6 +32,9 @@ Frontend (navegador) → API Gateway → EC2 #1, EC2 #2
 Cada microservicio tiene:
 - `Dockerfile`: build multi-etapa (JDK 25 → JRE 25)
 - `deploy-ec2.sh`: compila, sube JAR a EC2, reconstruye imagen y relanza contenedor
+
+El frontend se compila en GitHub Actions y se publica en `/usr/share/nginx/html`
+en la EC2 #3; Nginx sirve los archivos estáticos en los puertos 80 y 443.
 
 ## API Gateway
 

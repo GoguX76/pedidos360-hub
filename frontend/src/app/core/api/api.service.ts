@@ -39,6 +39,13 @@ export class ApiService {
     );
   }
 
+  /** Elimina un producto existente (requiere permisos de administrador). */
+  public deleteProduct(productId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.base}/api/v1/products/${productId}`,
+    );
+  }
+
   /**
    * Crea un pedido para el cliente autenticado
    *

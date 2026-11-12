@@ -68,6 +68,10 @@ export class MenuComponent implements OnInit {
 
   // Menú de administrador.
   protected adminMenuOpen = signal(false);
+  protected deleteMode = signal(false);
+  protected deletingProductId = signal<number | null>(null);
+  protected deleteMessage = signal('');
+  protected deleteMessageIsError = signal(false);
 
   // Formulario de "crear producto" (solo admin).
   protected productFormOpen = signal(false);
@@ -173,6 +177,48 @@ export class MenuComponent implements OnInit {
   /** Cierra el menú de administrador (al hacer clic fuera). */
   protected closeAdminMenu(): void {
     this.adminMenuOpen.set(false);
+  }
+
+  /** Activa o desactiva la opción de eliminación para las tarjetas. */
+  protected toggleDeleteMode(): void {
+    if (!this.authService.isAdmin()) return;
+
+    this.deleteMode.update((enabled) => !enabled);
+    this.deleteMessage.set('');
+    this.deleteMessageIsError.set(false);
+    this.adminMenuOpen.set(false);
+  }
+
+  /** Elimina el producto seleccionado después de confirmar la acción. */
+  protected deleteProduct(product: Product): void {
+    if (
+      !this.authService.isAdmin() ||
+      !this.deleteMode() ||
+      this.deletingProductId() !== null
+    ) {
+      return;
+    }
+
+    if (!window.confirm(`¿Eliminar "${product.name}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    this.deletingProductId.set(product.id);
+    this.deleteMessage.set('');
+    this.deleteMessageIsError.set(false);
+    this.apiService.deleteProduct(product.id).subscribe({
+      next: () => {
+        this.products.update((products) => products.filter((item) => item.id !== product.id));
+        this.deletingProductId.set(null);
+        this.deleteMessage.set(`Producto "${product.name}" eliminado correctamente.`);
+        this.deleteMessageIsError.set(false);
+      },
+      error: (err) => {
+        this.deletingProductId.set(null);
+        this.deleteMessage.set(`No se pudo eliminar "${product.name}": ${this.readError(err)}`);
+        this.deleteMessageIsError.set(true);
+      },
+    });
   }
 
   /** Abre el formulario de creación de producto con los campos en blanco. */

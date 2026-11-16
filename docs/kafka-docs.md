@@ -105,9 +105,13 @@ La configuración programática está en
 2. Un error recuperable se reintenta `app.kafka.retry.max-attempts` veces.
 3. Agotados los intentos, el mensaje se publica en `<topico>.DLT` sin perder el
    resto de la partición.
-4. Los consumidores registran el `eventId` procesado en un registro acotado en
-   memoria para no repetir notificaciones ante reentregas. En producción debe
-   reemplazarse por una tabla o Redis.
+4. Cada consumidor guarda los `eventId` procesados en la tabla
+   `processed_kafka_events` de la base de datos de su servicio. La clave
+   primaria evita registrar dos veces el mismo evento. En el perfil de
+   producción, los servicios usan PostgreSQL, por lo que estos registros
+   sobreviven al reinicio de la aplicación mientras la base de datos conserve
+   sus datos. En desarrollo, H2 está configurada en memoria y los registros se
+   pierden al reiniciar.
 
 ## Seguridad en kafka-admin
 

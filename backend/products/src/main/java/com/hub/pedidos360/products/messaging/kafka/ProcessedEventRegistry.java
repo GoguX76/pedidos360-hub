@@ -2,33 +2,29 @@ package com.hub.pedidos360.products.messaging.kafka;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * Registro en memoria y acotado de eventos ya procesados, para no repetir
- * notificaciones cuando Kafka reentrega el mismo mensaje.
+ * Registro persistente de eventos Kafka ya procesados.
+ *
+ * Consulta la base de datos del servicio para reconocer reentregas,
+ * incluso después de reiniciar la aplicación.
  */
+
 @Component
 public class ProcessedEventRegistry {
 
-    private static final int MAX_TRACKED_EVENTS = 10_000;
+    private final ProcessedKafkaEventRepository repository;
 
-    private final Set<String> processed = Collections.newSetFromMap(
-            Collections.synchronizedMap(new LinkedHashMap<>() {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
-                    return size() > MAX_TRACKED_EVENTS;
-                }
-            }));
+    public ProcessedEventRegistry(ProcessedKafkaEventRepository repository) {
+        this.repository = repository;
+    }
 
     public boolean isProcessed(String eventId) {
-        return processed.contains(eventId);
+        return repository.existsById(eventId);
     }
 
     public void markProcessed(String eventId) {
-        processed.add(eventId);
+        if (!isProcessed(eventId)) {
+            repository.save(new ProcessedKafkaEvent(eventId));
+        }
     }
 }

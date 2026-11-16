@@ -1,6 +1,7 @@
 package com.hub.pedidos360.orders.service;
 
 import com.hub.pedidos360.orders.dto.OrderResponse;
+import com.hub.pedidos360.orders.messaging.kafka.OrderEventPublisher;
 import com.hub.pedidos360.orders.messaging.order.OrderCreatedPublisher;
 import com.hub.pedidos360.orders.messaging.order.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
@@ -36,11 +37,15 @@ class OrderServiceTest {
     @Mock
     private OrderStatusChangedPublisher orderStatusChangedPublisher;
 
+    @Mock
+    private OrderEventPublisher orderEventPublisher;
+
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(orderRepository, orderCreatedPublisher, orderStatusChangedPublisher);
+        orderService = new OrderService(orderRepository, orderCreatedPublisher,
+                orderStatusChangedPublisher, orderEventPublisher);
     }
 
     @Test
@@ -66,6 +71,7 @@ class OrderServiceTest {
         assertThat(response.getStatus()).isEqualTo("IN_PREPARATION");
         verify(orderRepository).save(order);
         verify(orderStatusChangedPublisher, times(1)).publish(eq(order), eq(OrderStatus.CREATED));
+        verify(orderEventPublisher, times(1)).publishStatusChanged(order);
     }
 
     @Test
@@ -91,5 +97,6 @@ class OrderServiceTest {
         assertThat(response.getStatus()).isEqualTo("CANCELLED");
         verify(orderRepository).save(order);
         verify(orderStatusChangedPublisher, times(1)).publish(eq(order), eq(OrderStatus.CREATED));
+        verify(orderEventPublisher, times(1)).publishStatusChanged(order);
     }
 }

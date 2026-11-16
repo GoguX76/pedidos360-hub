@@ -39,7 +39,7 @@ class KafkaTopicServiceTest {
     @BeforeEach
     void setUp() {
         admin = mock(Admin.class);
-        service = new KafkaTopicService(admin, new KafkaAdminProperties(5, false, List.of()));
+        service = new KafkaTopicService(admin, new KafkaAdminProperties(5, false, false, List.of()));
     }
 
     @Test

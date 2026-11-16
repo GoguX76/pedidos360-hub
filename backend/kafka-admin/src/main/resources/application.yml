@@ -23,6 +23,7 @@ management:
 kafka-admin:
   timeout-seconds: 10
   bootstrap-enabled: true          # crea estos topicos al arrancar si no existen
+  bootstrap-fail-fast: true        # si no puede crear los topicos, detiene el arranque
   topics:                          # ajusta los nombres a los de KafkaTopics (common-messaging)
     - name: pedidos.eventos
       partitions: 3
@@ -36,5 +37,23 @@ kafka-admin:
       replication-factor: 2
       configs:
         "[retention.ms]": "2592000000"     # 30 dias
-        "[cleanup.policy]": "compact"
+        # Las alertas son eventos append-only: con "compact" el broker exige
+        # key y termina borrando alertas anteriores del mismo producto.
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "1"
+    # Topicos de mensajes fallidos (DLT): los crea el bootstrap para que los
+    # consumidores puedan derivar alli los eventos invalidos o agotados.
+    - name: pedidos.eventos.DLT
+      partitions: 3
+      replication-factor: 2
+      configs:
+        "[retention.ms]": "604800000"      # 7 dias
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "1"
+    - name: inventario.alertas.DLT
+      partitions: 2
+      replication-factor: 2
+      configs:
+        "[retention.ms]": "2592000000"     # 30 dias
+        "[cleanup.policy]": "delete"
         "[min.insync.replicas]": "1"

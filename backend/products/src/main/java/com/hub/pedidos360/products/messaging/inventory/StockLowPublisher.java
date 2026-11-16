@@ -3,6 +3,7 @@ package com.hub.pedidos360.products.messaging.inventory;
 import com.hub.pedidos360.messaging.MessagingTopology;
 import com.hub.pedidos360.products.dto.ProductResponse;
 import com.hub.pedidos360.products.messaging.EventPublisher;
+import com.hub.pedidos360.products.messaging.kafka.KafkaInventoryAlertPublisher;
 import com.hub.pedidos360.products.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,13 @@ public class StockLowPublisher {
 
     private final EventPublisher eventPublisher;
     private final ProductService productService;
+    private final KafkaInventoryAlertPublisher kafkaInventoryAlertPublisher;
 
-    public StockLowPublisher(EventPublisher eventPublisher, ProductService productService) {
+    public StockLowPublisher(EventPublisher eventPublisher, ProductService productService,
+            KafkaInventoryAlertPublisher kafkaInventoryAlertPublisher) {
         this.eventPublisher = eventPublisher;
         this.productService = productService;
+        this.kafkaInventoryAlertPublisher = kafkaInventoryAlertPublisher;
     }
 
     public void checkAndPublish(Long productId) {
@@ -48,6 +52,14 @@ public class StockLowPublisher {
             );
             log.info("Alerta de stock bajo emitida para producto '{}' (ID: {}). Stock restante: {}",
                     product.getName(), product.getId(), product.getStock());
+
+            // El fallo de Kafka no debe romper el flujo principal de RabbitMQ.
+            try {
+                kafkaInventoryAlertPublisher.publish(product, STOCK_THRESHOLD);
+            } catch (RuntimeException e) {
+                log.error("No se pudo emitir la alerta de stock bajo por Kafka para el producto {}: {}",
+                        product.getId(), e.getMessage(), e);
+            }
         }
     }
 }

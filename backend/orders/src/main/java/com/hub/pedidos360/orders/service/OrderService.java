@@ -5,6 +5,7 @@ import com.hub.pedidos360.orders.dto.OrderItemResponse;
 import com.hub.pedidos360.orders.dto.OrderRequest;
 import com.hub.pedidos360.orders.dto.OrderResponse;
 import com.hub.pedidos360.messaging.AfterCommitExecutor;
+import com.hub.pedidos360.orders.messaging.kafka.OrderEventPublisher;
 import com.hub.pedidos360.orders.messaging.order.OrderCreatedPublisher;
 import com.hub.pedidos360.orders.messaging.order.OrderStatusChangedPublisher;
 import com.hub.pedidos360.orders.model.DispatchType;
@@ -32,13 +33,16 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderCreatedPublisher orderCreatedPublisher;
     private final OrderStatusChangedPublisher orderStatusChangedPublisher;
+    private final OrderEventPublisher orderEventPublisher;
 
     public OrderService(OrderRepository orderRepository,
                         OrderCreatedPublisher orderCreatedPublisher,
-                        OrderStatusChangedPublisher orderStatusChangedPublisher) {
+                        OrderStatusChangedPublisher orderStatusChangedPublisher,
+                        OrderEventPublisher orderEventPublisher) {
         this.orderRepository = orderRepository;
         this.orderCreatedPublisher = orderCreatedPublisher;
         this.orderStatusChangedPublisher = orderStatusChangedPublisher;
+        this.orderEventPublisher = orderEventPublisher;
     }
 
     /**
@@ -77,7 +81,10 @@ public class OrderService {
         order.setTotalAmount(total);
 
         Order saved = orderRepository.save(order);
-        publishAfterCommit(() -> orderCreatedPublisher.publish(saved));
+        publishAfterCommit(() -> {
+            orderCreatedPublisher.publish(saved);
+            orderEventPublisher.publishCreated(saved);
+        });
         return toResponse(saved);
     }
 
@@ -145,7 +152,10 @@ public class OrderService {
         OrderStatus previousStatus = order.getStatus();
         order.setStatus(status);
         Order saved = orderRepository.save(order);
-        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
+        publishAfterCommit(() -> {
+            orderStatusChangedPublisher.publish(saved, previousStatus);
+            orderEventPublisher.publishStatusChanged(saved);
+        });
         return toResponse(saved);
     }
 
@@ -167,7 +177,10 @@ public class OrderService {
         OrderStatus previousStatus = order.getStatus();
         order.setStatus(OrderStatus.CANCELLED);
         Order saved = orderRepository.save(order);
-        publishAfterCommit(() -> orderStatusChangedPublisher.publish(saved, previousStatus));
+        publishAfterCommit(() -> {
+            orderStatusChangedPublisher.publish(saved, previousStatus);
+            orderEventPublisher.publishStatusChanged(saved);
+        });
         return toResponse(saved);
     }
 

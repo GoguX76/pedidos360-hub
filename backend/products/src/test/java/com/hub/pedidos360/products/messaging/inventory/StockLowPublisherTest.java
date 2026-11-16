@@ -3,6 +3,7 @@ package com.hub.pedidos360.products.messaging.inventory;
 import com.hub.pedidos360.messaging.MessagingTopology;
 import com.hub.pedidos360.products.dto.ProductResponse;
 import com.hub.pedidos360.products.messaging.EventPublisher;
+import com.hub.pedidos360.products.messaging.kafka.KafkaInventoryAlertPublisher;
 import com.hub.pedidos360.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,11 +29,14 @@ class StockLowPublisherTest {
     @Mock
     private ProductService productService;
 
+    @Mock
+    private KafkaInventoryAlertPublisher kafkaInventoryAlertPublisher;
+
     private StockLowPublisher stockLowPublisher;
 
     @BeforeEach
     void setUp() {
-        stockLowPublisher = new StockLowPublisher(eventPublisher, productService);
+        stockLowPublisher = new StockLowPublisher(eventPublisher, productService, kafkaInventoryAlertPublisher);
     }
 
     @Test

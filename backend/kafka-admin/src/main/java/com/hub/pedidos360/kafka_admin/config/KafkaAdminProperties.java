@@ -6,7 +6,8 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "kafka-admin")
-public record KafkaAdminProperties(int timeoutSeconds, boolean bootstrapEnabled, List<TopicSpec> topics) {
+public record KafkaAdminProperties(int timeoutSeconds, boolean bootstrapEnabled, boolean bootstrapFailFast,
+        List<TopicSpec> topics) {
 
     public KafkaAdminProperties {
         if (timeoutSeconds <= 0) {

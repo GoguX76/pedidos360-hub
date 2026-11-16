@@ -38,6 +38,10 @@ class TopicBootstrap implements ApplicationRunner {
             } catch (TopicAlreadyExistsException e) {
                 log.info("Topico '{}' ya existia, se conserva", spec.name());
             } catch (KafkaAdminException e) {
+                if (props.bootstrapFailFast()) {
+                    throw new IllegalStateException(
+                            "No se pudo crear el topico '" + spec.name() + "': " + e.getMessage(), e);
+                }
                 log.warn("No se pudo crear el topico '{}': {}", spec.name(), e.getMessage());
             }
         }

@@ -65,5 +65,5 @@ jobs:
               exit 1
             fi
           done
-          chmod +x deploy-ec2.sh
+          chmod +x gradlew deploy-ec2.sh
           ./deploy-ec2.sh

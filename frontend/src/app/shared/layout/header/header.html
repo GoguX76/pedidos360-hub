@@ -24,41 +24,62 @@
       </span>
     </nav>
 
-    <div class="relative">
-      @if (authService.authenticatedUser()) {
-        <button
-          type="button"
-          (click)="toggleUserMenu()"
-          class="flex items-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm font-semibold text-ink transition-colors hover:border-ember"
-        >
-          <i class="ti ti-user-circle text-base text-ember" aria-hidden="true"></i>
-          <span class="max-w-[10rem] truncate">{{ authService.userName() ?? 'Mi cuenta' }}</span>
-          <i class="ti ti-chevron-down text-xs opacity-70" aria-hidden="true"></i>
-        </button>
-
-        @if (showUserMenu()) {
-          <div
-            class="absolute right-0 top-full mt-2 w-44 rounded-xl border border-white/10 bg-surface p-1.5 shadow-xl shadow-black/40"
+    <div class="flex items-center gap-3">
+      <!-- Botón Carrito -->
+      <a
+        routerLink="/carrito"
+        routerLinkActive="border-ember text-ember"
+        class="relative inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm font-semibold text-ink no-underline transition-colors hover:border-ember"
+        aria-label="Ver carrito de compras"
+      >
+        <i class="ti ti-shopping-cart text-base text-ember" aria-hidden="true"></i>
+        <span class="hidden sm:inline">Carrito</span>
+        @if (cartService.totalItems() > 0) {
+          <span
+            class="flex h-5 min-w-5 items-center justify-center rounded-full bg-ember px-1.5 text-xs font-bold text-bg"
           >
-            <button
-              type="button"
-              (click)="onLogoutClick()"
-              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
-            >
-              <i class="ti ti-logout text-base" aria-hidden="true"></i>
-              Cerrar sesión
-            </button>
-          </div>
+            {{ cartService.totalItems() }}
+          </span>
         }
-      } @else {
-        <button
-          type="button"
-          (click)="onLoginClick()"
-          class="rounded-lg bg-ember px-4 py-1.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover"
-        >
-          Iniciar sesión
-        </button>
-      }
+      </a>
+
+      <!-- Menú de usuario -->
+      <div class="relative">
+        @if (authService.authenticatedUser()) {
+          <button
+            type="button"
+            (click)="toggleUserMenu()"
+            class="flex items-center gap-2 rounded-lg border border-white/15 px-3 py-1.5 text-sm font-semibold text-ink transition-colors hover:border-ember"
+          >
+            <i class="ti ti-user-circle text-base text-ember" aria-hidden="true"></i>
+            <span class="max-w-[10rem] truncate">{{ authService.userName() ?? 'Mi cuenta' }}</span>
+            <i class="ti ti-chevron-down text-xs opacity-70" aria-hidden="true"></i>
+          </button>
+
+          @if (showUserMenu()) {
+            <div
+              class="absolute right-0 top-full mt-2 w-44 rounded-xl border border-white/10 bg-surface p-1.5 shadow-xl shadow-black/40"
+            >
+              <button
+                type="button"
+                (click)="onLogoutClick()"
+                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
+              >
+                <i class="ti ti-logout text-base" aria-hidden="true"></i>
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        } @else {
+          <button
+            type="button"
+            (click)="onLoginClick()"
+            class="rounded-lg bg-ember px-4 py-1.5 text-sm font-semibold text-bg transition-colors hover:bg-ember-hover"
+          >
+            Iniciar sesión
+          </button>
+        }
+      </div>
     </div>
   </div>
 </header>

@@ -2,6 +2,7 @@
 contexto-caso
 node_modules/
 backend/bin/
+*.pem
 
 # Dependencies
 node_modules/

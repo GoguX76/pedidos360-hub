@@ -1,0 +1,73 @@
+server:
+  port: 8084   # ajusta si choca con otro microservicio
+
+spring:
+  application:
+    name: kafka-admin
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AZURE_JWK_SET_URI:https://login.microsoftonline.com/${azure.tenant-id}/discovery/v2.0/keys}
+
+azure:
+  tenant-id: ${AZURE_TENANT_ID:6a3978a5-1a22-4be4-bbb8-a7c6279c471e}
+  jwk-set-uri: https://login.microsoftonline.com/${azure.tenant-id}/discovery/v2.0/keys
+  v1-issuer: https://sts.windows.net/${azure.tenant-id}/
+  api-audience: ${AZURE_API_AUDIENCE:api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,https://34.230.203.32}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+kafka-admin:
+  timeout-seconds: 10
+  bootstrap-enabled: true          # crea estos topicos al arrancar si no existen
+  bootstrap-fail-fast: true        # si no puede crear los topicos, detiene el arranque
+  topics:                          # ajusta los nombres a los de KafkaTopics (common-messaging)
+    - name: pedidos.eventos
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[retention.ms]": "604800000"      # 7 dias
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "2"
+    - name: inventario.alertas
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[retention.ms]": "2592000000"     # 30 dias
+        # Las alertas son eventos append-only: con "compact" el broker exige
+        # key y termina borrando alertas anteriores del mismo producto.
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "2"
+    - name: pedidos.conteo-por-estado
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[cleanup.policy]": "compact"
+        "[min.insync.replicas]": "2"
+    # Topicos de mensajes fallidos (DLT): los crea el bootstrap para que los
+    # consumidores puedan derivar alli los eventos invalidos o agotados.
+    - name: pedidos.eventos.DLT
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[retention.ms]": "604800000"      # 7 dias
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "2"
+    - name: inventario.alertas.DLT
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[retention.ms]": "2592000000"     # 30 dias
+        "[cleanup.policy]": "delete"
+        "[min.insync.replicas]": "2"

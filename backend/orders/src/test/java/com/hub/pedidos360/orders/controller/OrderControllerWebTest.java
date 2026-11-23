@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -58,7 +59,8 @@ class OrderControllerWebTest {
         request.setItems(List.of(new OrderItemRequest(10L, "Arepa", 2, new BigDecimal("5.50"))));
 
         mockMvc.perform(post("/api/v1/orders")
-                .with(jwt().jwt(jwt -> jwt.claim("oid", "oid-123")))
+                .with(jwt().jwt(jwt -> jwt.claim("oid", "oid-123"))
+                        .authorities(new SimpleGrantedAuthority("ROLE_CLIENTE")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -69,7 +71,7 @@ class OrderControllerWebTest {
     @Test
     void crearPedido_BodyInvalido_Retorna400ConFieldErrors() throws Exception {
         mockMvc.perform(post("/api/v1/orders")
-                .with(jwt())
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_CLIENTE")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"customerName\":\"\",\"items\":[]}"))
             .andExpect(status().isBadRequest())

@@ -16,6 +16,7 @@
 | EC2 #2 | `products` | 8082 |
 | EC2 #3 | `frontend` (Nginx) | 80, 443 |
 | EC2 #4 | RabbitMQ (Docker) | 5672, 15672 |
+| EC2 #5 | Kafka (3 brokers) + `kafka-admin` (Docker) | 9092-9094, 8084 |
 
 ## Conexión entre instancias
 
@@ -24,8 +25,18 @@ Los Security Groups permiten tráfico entre las instancias:
 ```
 EC2 #1 (orders)     → EC2 #4 (RabbitMQ):5672
 EC2 #2 (products)   → EC2 #4 (RabbitMQ):5672
+EC2 #1/#2 (orders/products) → EC2 #5 (Kafka):9092/9093/9094
+EC2 #5 (`kafka-admin`) → Kafka brokers por `kafkanet` (19092)
 Frontend (navegador) → API Gateway → EC2 #1, EC2 #2
 ```
+
+## Kafka Admin
+
+La instancia EC2 dedicada ejecuta Kafka y `kafka-admin`, y usa un Security
+Group propio. Se permite TCP 8084 para la integración pública de API Gateway,
+SSH 22 solo desde la IP administrativa y TCP 9092-9094 desde el SG compartido
+por `orders` y `products`. Los endpoints de `kafka-admin` requieren JWT salvo
+health; es preferible usar integración privada/VPC Link si se configura después.
 
 ## Despliegue
 

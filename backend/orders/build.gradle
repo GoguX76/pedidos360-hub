@@ -27,6 +27,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	// Kafka: productor de eventos de pedido y consumidor de alertas de inventario.
+	implementation 'org.springframework.boot:spring-boot-starter-kafka'
 	// Topologia/retry/DLQ compartidos (ver backend/common-messaging).
 	implementation 'com.hub.pedidos360:common-messaging'
 

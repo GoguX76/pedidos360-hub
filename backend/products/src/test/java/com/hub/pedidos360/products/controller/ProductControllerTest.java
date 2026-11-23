@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -60,7 +61,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated())
@@ -78,7 +79,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest())
@@ -95,7 +96,7 @@ class ProductControllerTest {
                 """;
 
         mockMvc.perform(post("/api/v1/products")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest())
@@ -129,7 +130,7 @@ class ProductControllerTest {
         Product saved = productRepository.save(product("Para borrar", true));
 
         mockMvc.perform(delete("/api/v1/products/" + saved.getId())
-                        .with(jwt()))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/products/" + saved.getId()))
@@ -141,7 +142,7 @@ class ProductControllerTest {
         Product saved = productRepository.save(product("Arepa", true));
 
         mockMvc.perform(post("/api/v1/products/" + saved.getId() + "/decrement")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .param("quantity", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stock").value(8));
@@ -152,7 +153,7 @@ class ProductControllerTest {
         Product saved = productRepository.save(product("Arepa", true));
 
         mockMvc.perform(post("/api/v1/products/" + saved.getId() + "/decrement")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .param("quantity", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").exists());
@@ -161,7 +162,7 @@ class ProductControllerTest {
     @Test
     void decrementEnProductoInexistenteDevuelve404() throws Exception {
         mockMvc.perform(post("/api/v1/products/999999/decrement")
-                        .with(jwt())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .param("quantity", "1"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").exists());

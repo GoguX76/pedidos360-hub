@@ -44,6 +44,11 @@ Cada microservicio tiene:
 - `Dockerfile`: build multi-etapa (JDK 25 → JRE 25)
 - `deploy-ec2.sh`: compila, sube JAR a EC2, reconstruye imagen y relanza contenedor
 
+Los workflows de `orders` y `products` requieren el secreto de GitHub Actions
+`KAFKA_BOOTSTRAP_SERVERS`, con los brokers alcanzables desde esas EC2 en formato
+separado por comas (`host1:9092,host2:9093,host3:9094`). Usa las direcciones
+privadas de los brokers dentro de la VPC; no guardes esas direcciones en el repo.
+
 El frontend se compila en GitHub Actions y se publica en `/usr/share/nginx/html`
 en la EC2 #3; Nginx sirve los archivos estáticos en los puertos 80 y 443.
 

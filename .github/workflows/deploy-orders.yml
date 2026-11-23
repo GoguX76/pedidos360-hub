@@ -57,9 +57,10 @@ jobs:
           RABBITMQ_PORT: ${{ secrets.ORDERS_RABBITMQ_PORT }}
           RABBITMQ_USER: ${{ secrets.ORDERS_RABBITMQ_USER }}
           RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASSWORD }}
+          KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.KAFKA_BOOTSTRAP_SERVERS }}
         run: |
           set -euo pipefail
-          for name in DB_URL DB_USER DB_PASSWORD RABBITMQ_HOST RABBITMQ_PORT RABBITMQ_USER RABBITMQ_PASS; do
+          for name in DB_URL DB_USER DB_PASSWORD RABBITMQ_HOST RABBITMQ_PORT RABBITMQ_USER RABBITMQ_PASS KAFKA_BOOTSTRAP_SERVERS; do
             if [ -z "${!name}" ]; then
               echo "::error::Configure the secret mapped to $name for orders."
               exit 1

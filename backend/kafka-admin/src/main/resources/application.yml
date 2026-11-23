@@ -5,7 +5,7 @@ spring:
   application:
     name: kafka-admin
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
   security:
     oauth2:
       resourceserver:
@@ -35,33 +35,33 @@ kafka-admin:
   topics:                          # ajusta los nombres a los de KafkaTopics (common-messaging)
     - name: pedidos.eventos
       partitions: 3
-      replication-factor: 2
+      replication-factor: 3
       configs:
         "[retention.ms]": "604800000"      # 7 dias
         "[cleanup.policy]": "delete"
-        "[min.insync.replicas]": "1"
+        "[min.insync.replicas]": "2"
     - name: inventario.alertas
-      partitions: 2
-      replication-factor: 2
+      partitions: 3
+      replication-factor: 3
       configs:
         "[retention.ms]": "2592000000"     # 30 dias
         # Las alertas son eventos append-only: con "compact" el broker exige
         # key y termina borrando alertas anteriores del mismo producto.
         "[cleanup.policy]": "delete"
-        "[min.insync.replicas]": "1"
+        "[min.insync.replicas]": "2"
     # Topicos de mensajes fallidos (DLT): los crea el bootstrap para que los
     # consumidores puedan derivar alli los eventos invalidos o agotados.
     - name: pedidos.eventos.DLT
       partitions: 3
-      replication-factor: 2
+      replication-factor: 3
       configs:
         "[retention.ms]": "604800000"      # 7 dias
         "[cleanup.policy]": "delete"
-        "[min.insync.replicas]": "1"
+        "[min.insync.replicas]": "2"
     - name: inventario.alertas.DLT
-      partitions: 2
-      replication-factor: 2
+      partitions: 3
+      replication-factor: 3
       configs:
         "[retention.ms]": "2592000000"     # 30 dias
         "[cleanup.policy]": "delete"
-        "[min.insync.replicas]": "1"
+        "[min.insync.replicas]": "2"

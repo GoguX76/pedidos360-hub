@@ -42,7 +42,7 @@ public class KafkaConfig {
     private final int maxAttempts;
 
     public KafkaConfig(
-            @Value("${spring.kafka.bootstrap-servers:localhost:9092,localhost:9093}") String bootstrapServers,
+            @Value("${spring.kafka.bootstrap-servers:localhost:9092,localhost:9093,localhost:9094}") String bootstrapServers,
             @Value("${app.kafka.orders-consumer-group:orders-notifications}") String consumerGroup,
             @Value("${app.kafka.retry.max-attempts:2}") int maxAttempts) {
         this.bootstrapServers = bootstrapServers;

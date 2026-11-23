@@ -74,8 +74,15 @@ eventId, productId, productName, currentStock, threshold, alertAt
 `orders` y `products` comparten el bootstrap de brokers:
 
 ```properties
-spring.kafka.bootstrap-servers=${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093}
+spring.kafka.bootstrap-servers=${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
 ```
+
+El Compose local levanta tres brokers (`kafka1`, `kafka2` y `kafka3`) en los
+puertos externos `9092`, `9093` y `9094`. Cada tópico y su DLT se crean con
+tres particiones y factor de réplica 3; `min.insync.replicas=2` permite seguir
+escribiendo si un broker queda fuera, siempre que dos réplicas sigan sincronizadas.
+Los tres brokers locales comparten la misma máquina, por lo que esto valida la
+configuración de Kafka pero no protege contra la caída de esa máquina.
 
 Grupos y reintentos:
 
@@ -129,7 +136,9 @@ La configuración programática está en
    docker compose up -d
    ```
 
-   Kafka UI queda en `http://localhost:8090`.
+   Kafka UI queda en `http://localhost:8090`. Para validar que los tópicos se
+   creen, también hay que arrancar `kafka-admin`; al iniciar, crea los tópicos
+   definidos arriba.
 
 2. Arrancar `kafka-admin` (crea los tópicos y los DLT):
 

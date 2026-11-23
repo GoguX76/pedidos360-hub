@@ -2,6 +2,7 @@
 contexto-caso
 node_modules/
 backend/bin/
+*.pem
 
 # Dependencies
 node_modules/
@@ -26,5 +27,10 @@ Lo que tengo que hacer.txt
 
 handoff-tarea3-rabbitmq
 
+/infra/kafka/secrets/
+
 # Git worktree artifacts
 .delta/
+
+#trabajo de kafka
+plan-implementacion-kafka-notificaciones

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: order-streams
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
+    streams:
+      application-id: ${KAFKA_STREAMS_APPLICATION_ID:pedidos-status-count}
+      state-dir: ${KAFKA_STREAMS_STATE_DIR:/tmp/kafka-streams}
+      properties:
+        replication.factor: ${KAFKA_STREAMS_REPLICATION_FACTOR:3}
+        processing.guarantee: exactly_once_v2
+        auto.offset.reset: earliest
+        num.stream.threads: 1
+
+app:
+  kafka:
+    order-events-topic: ${KAFKA_ORDER_EVENTS_TOPIC:pedidos.eventos}
+    order-status-counts-topic: ${KAFKA_ORDER_STATUS_COUNTS_TOPIC:pedidos.conteo-por-estado}

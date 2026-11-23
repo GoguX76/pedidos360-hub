@@ -34,6 +34,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    // Kafka: productor de alertas de inventario y consumidor de eventos de pedido.
+    implementation 'org.springframework.boot:spring-boot-starter-kafka'
     // Topologia/retry/DLQ compartidos (ver backend/common-messaging).
     implementation 'com.hub.pedidos360:common-messaging'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

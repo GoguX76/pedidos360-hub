@@ -35,6 +35,7 @@ dependencies {
 	api 'org.springframework:spring-context'
 	api 'org.springframework:spring-tx'
 	api 'com.fasterxml.jackson.core:jackson-databind'
+	api 'jakarta.validation:jakarta.validation-api'
 
 	compileOnly 'org.slf4j:slf4j-api'
 }

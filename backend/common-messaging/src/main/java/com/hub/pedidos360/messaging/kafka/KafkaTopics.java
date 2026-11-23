@@ -16,6 +16,8 @@ public final class KafkaTopics {
     public static final String INVENTORY_ALERTS = "inventario.alertas";
 
     /** Sufijo con el que se nombran los topicos de mensajes fallidos (DLT). */
+    public static final String ORDER_STATUS_COUNTS = "pedidos.conteo-por-estado";
+
     public static final String DEAD_LETTER_SUFFIX = ".DLT";
 
     public static final String ORDER_EVENTS_DLT = ORDER_EVENTS + DEAD_LETTER_SUFFIX;

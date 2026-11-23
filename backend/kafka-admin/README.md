@@ -31,22 +31,30 @@ Al arrancar crea los topicos de application.yml (kafka-admin.topics).
 
 ## Despliegue en EC2
 
-La instancia actual `98.95.43.84` ejecuta Kafka y `kafka-admin` en contenedores
-separados. Docker Compose publica tres brokers en `9092`, `9093` y `9094` y los
-anuncia con la IP privada de la instancia. `kafka-admin` usa
+La instancia dedicada ejecuta Kafka y `kafka-admin` en contenedores separados.
+Docker Compose publica tres brokers en `9092`, `9093` y `9094` y los anuncia con
+la IP privada de la instancia. `kafka-admin` usa
 `kafka1:19092,kafka2:19092,kafka3:19092` en la red Docker `kafkanet`; `orders`
 y `products` usan la IP privada y los puertos publicados.
 
-Kafka UI escucha solo en `127.0.0.1:8090` en la EC2. Para abrirla desde el
-equipo local, crea un túnel SSH:
+Kafka UI escucha solo en `127.0.0.1:8090` en la EC2. La opción recomendada para
+acceder desde el equipo local es mantener ese enlace privado y crear un túnel SSH:
 
 ```bash
-ssh -i C:/Users/pv-alumno/Downloads/pedidos360.pem \
-  -L 8091:127.0.0.1:8090 ec2-user@98.95.43.84
+ssh -i <ruta-a-la-llave.pem> \
+  -L 8091:127.0.0.1:8090 ec2-user@<IPv4-publica-de-la-EC2>
 ```
 
 Luego visita `http://localhost:8091`. No se requiere abrir 8090 en el Security
 Group.
+
+También se puede publicar una entrada HTTPS con autenticación básica usando el
+perfil `public-ui` y el proxy Nginx de `infra/kafka/docker-compose.yml`. El
+certificado autofirmado y las credenciales se generan en la EC2 con
+`infra/kafka/setup-kafka-ui-access.sh <IPv4-publica-de-la-EC2>`. Limita el
+inbound TCP 443 del Security Group a **My IP**; no publiques 8090 ni los puertos
+de los brokers. El navegador mostrará una advertencia por el certificado
+autofirmado; para un certificado confiable, usa un dominio propio.
 
 En la EC2, los brokers y Kafka UI se levantan desde `/home/ec2-user/kafka`:
 
@@ -59,6 +67,7 @@ Desde `backend/kafka-admin`:
 
 ```bash
 KEY_PATH=C:/Users/pv-alumno/Downloads/pedidos360.pem \
+KAFKA_ADMIN_IP=<IPv4-publica-de-la-EC2> \
 KAFKA_BOOTSTRAP_SERVERS=kafka1:19092,kafka2:19092,kafka3:19092 \
 ./deploy-ec2.sh
 ```

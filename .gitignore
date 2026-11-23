@@ -27,6 +27,8 @@ Lo que tengo que hacer.txt
 
 handoff-tarea3-rabbitmq
 
+/infra/kafka/secrets/
+
 # Git worktree artifacts
 .delta/
 

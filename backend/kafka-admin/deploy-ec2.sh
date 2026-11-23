@@ -3,7 +3,7 @@
 set -euo pipefail
 
 KEY_PATH="${KEY_PATH:?Exporta KEY_PATH con la ruta de tu llave .pem}"
-KAFKA_ADMIN_IP="${KAFKA_ADMIN_IP:-98.95.43.84}"
+KAFKA_ADMIN_IP="${KAFKA_ADMIN_IP:?Exporta KAFKA_ADMIN_IP con la IPv4 publica actual de la instancia Kafka}"
 REMOTE_DIR="/home/ec2-user/kafka-admin"
 
 KAFKA_BOOTSTRAP_SERVERS="${KAFKA_BOOTSTRAP_SERVERS:-kafka1:19092,kafka2:19092,kafka3:19092}"

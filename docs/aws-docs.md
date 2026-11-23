@@ -32,7 +32,7 @@ Frontend (navegador) → API Gateway → EC2 #1, EC2 #2
 
 ## Kafka Admin
 
-La instancia `98.95.43.84` ejecuta Kafka y `kafka-admin`, y usa un Security
+La instancia EC2 dedicada ejecuta Kafka y `kafka-admin`, y usa un Security
 Group propio. Se permite TCP 8084 para la integración pública de API Gateway,
 SSH 22 solo desde la IP administrativa y TCP 9092-9094 desde el SG compartido
 por `orders` y `products`. Los endpoints de `kafka-admin` requieren JWT salvo

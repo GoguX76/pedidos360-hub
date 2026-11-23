@@ -49,6 +49,12 @@ kafka-admin:
         # key y termina borrando alertas anteriores del mismo producto.
         "[cleanup.policy]": "delete"
         "[min.insync.replicas]": "2"
+    - name: pedidos.conteo-por-estado
+      partitions: 3
+      replication-factor: 3
+      configs:
+        "[cleanup.policy]": "compact"
+        "[min.insync.replicas]": "2"
     # Topicos de mensajes fallidos (DLT): los crea el bootstrap para que los
     # consumidores puedan derivar alli los eventos invalidos o agotados.
     - name: pedidos.eventos.DLT

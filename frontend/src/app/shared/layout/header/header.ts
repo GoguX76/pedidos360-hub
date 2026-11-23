@@ -1,11 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { CartService } from '../../../core/cart/cart.service';
 
-/**
- * Barra de navegación superior compartida por toda la app.
- * Reemplaza la navegación que antes estaba duplicada en login y menu.
- */
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -15,6 +12,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 })
 export class HeaderComponent {
   protected authService = inject(AuthService);
+  protected cartService = inject(CartService);
   protected showUserMenu = signal(false);
 
   protected toggleUserMenu(): void {

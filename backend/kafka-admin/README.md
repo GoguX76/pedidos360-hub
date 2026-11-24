@@ -66,7 +66,7 @@ docker compose up -d zookeeper kafka1 kafka2 kafka3 kafka-ui
 Desde `backend/kafka-admin`:
 
 ```bash
-KEY_PATH=C:/Users/pv-alumno/Downloads/pedidos360.pem \
+KEY_PATH=<ruta-a-la-llave.pem> \
 KAFKA_ADMIN_IP=<IPv4-publica-de-la-EC2> \
 KAFKA_BOOTSTRAP_SERVERS=kafka1:19092,kafka2:19092,kafka3:19092 \
 ./deploy-ec2.sh

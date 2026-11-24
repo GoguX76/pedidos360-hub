@@ -25,9 +25,11 @@ spring.jpa.show-sql=false
 
 | Microservicio | Base de datos | Tablas |
 |---|---|---|
-| `orders` | `pedidos360` | `orders`, `order_items` |
-| `products` | `pedidos360` | `products` |
+| `orders` | `pedidos360` | `orders`, `order_items`, `processed_kafka_events` |
+| `products` | `pedidos360` | `products`, `processed_kafka_events` |
 | `rabbitmq-admin` | — | No usa base de datos |
+| `kafka-admin` | — | No usa base de datos |
+| `kafka-streams` | — | No usa base de datos |
 
 ## Características
 

@@ -11,6 +11,8 @@ Spring Boot 4.1.0 con Java 25.
 | `orders` | 8081 | CRUD de pedidos, máquina de estados, cálculo de totales |
 | `products` | 8082 | CRUD de productos, descuento de stock atómico |
 | `rabbitmq-admin` | 8083 | Administración de RabbitMQ (colas, exchanges, bindings) |
+| `kafka-admin` | 8084 | Administración de Kafka (tópicos, grupos, offsets) |
+| `kafka-streams` | — | Procesamiento de streams de Kafka (conteo por estado) |
 
 ## Estructura por microservicio
 
@@ -22,9 +24,13 @@ src/main/java/com/hub/pedidos360/<servicio>/
 ├── repository/       # JPA repositories
 ├── model/            # Entidades JPA
 ├── dto/              # Request/Response DTOs
-├── messaging/        # Publishers y consumidores RabbitMQ
+├── messaging/        # Publishers y consumidores (RabbitMQ y Kafka)
 └── exception/        # GlobalExceptionHandler
 ```
+
+El módulo compartido `common-messaging` centraliza la topología de RabbitMQ
+(`RabbitTopologyConfig` + `MessagingTopology`) y los contratos/utilidades de
+Kafka. Los microservicios de negocio lo habilitan con `@Import`.
 
 ## Características principales
 

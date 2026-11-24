@@ -48,3 +48,20 @@ stop_app → reset → join_cluster rabbit@rabbit1 → start_app
 ## Red
 
 Los contenedores de RabbitMQ usan una red bridge `rabbitnet` para comunicarse entre sí.
+
+## Docker Compose — Kafka
+
+`infra/kafka/docker-compose.yml` levanta:
+
+| Servicio | Imagen | Puertos |
+|---|---|---|
+| `zookeeper` | confluentinc/cp-zookeeper | 2181 |
+| `kafka1` | confluentinc/cp-kafka | 9092 |
+| `kafka2` | confluentinc/cp-kafka | 9093 |
+| `kafka3` | confluentinc/cp-kafka | 9094 |
+| `kafka-ui` | provectuslabs/kafka-ui | 8090 (solo localhost) |
+| `kafka-ui-public` | nginx:alpine | 443 (perfil `public-ui`) |
+| `order-streams` | pedidos360-order-streams | — (perfil `streams`) |
+
+Los brokers se comunican por la red bridge `kafkanet`. Kafka UI queda expuesto
+solo en `127.0.0.1:8090` por defecto.

@@ -8,11 +8,11 @@ Microsoft Entra ID es el proveedor de identidad. El frontend obtiene un JWT y lo
 
 | Valor | Descripción |
 |---|---|
-| Tenant ID | `6a3978a5-1a22-4be4-bbb8-a7c6279c471e` |
-| Client ID (frontend) | `4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4` |
-| Scope de la API | `api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4/access_as_user` |
-| Audience del token | `api://4d1afbc7-9d81-4ef4-a0e2-fd0ec724f8f4` |
-| Issuer (token v1) | `https://sts.windows.net/6a3978a5-1a22-4be4-bbb8-a7c6279c471e/` |
+| Tenant ID | Configurar por entorno (`AZURE_TENANT_ID`) |
+| Client ID (frontend) | Configurar por entorno (`AZURE_CLIENT_ID`) |
+| Scope de la API | `api://<client-id>/access_as_user` |
+| Audience del token | `api://<client-id>` |
+| Issuer (token v1) | `https://sts.windows.net/<tenant-id>/` |
 
 ## Flujo de autenticación
 

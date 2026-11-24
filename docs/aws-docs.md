@@ -5,7 +5,7 @@
 | Componente | Descripción |
 |---|---|
 | EC2 | Máquinas virtuales donde corren los microservicios y RabbitMQ |
-| API Gateway | Punto de entrada HTTP para el frontend (`https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com`) |
+| API Gateway | Punto de entrada HTTP para el frontend (URL configurada por entorno) |
 | Security Groups | Reglas de firewall entre instancias |
 
 ## Instancias EC2
@@ -54,6 +54,6 @@ en la EC2 #3; Nginx sirve los archivos estáticos en los puertos 80 y 443.
 
 ## API Gateway
 
-- **URL**: `https://y2fmjg2ed2.execute-api.us-east-1.amazonaws.com`
+- **URL**: configurada por entorno (no versionar el endpoint real)
 - **Rutas**: `/api/v1/orders*` → EC2 #1, `/api/v1/products*` → EC2 #2
 - **Método**: HTTP API con integración HTTP_PROXY

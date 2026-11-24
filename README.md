@@ -22,8 +22,8 @@ El menú **Admin** (crear producto) solo aparece cuando el usuario tiene el rol 
 | Capa | Tecnología |
 |---|---|
 | Frontend | Angular + Tailwind CSS |
-| Backend | Spring Boot (Java) |
-| Mensajería | RabbitMQ |
+| Backend | Spring Boot (Java 25) |
+| Mensajería | RabbitMQ y Apache Kafka |
 | Base de datos | PostgreSQL (producción) / H2 (desarrollo) |
 | Autenticación | Microsoft Entra ID (JWT) |
 | Infraestructura | AWS (EC2, API Gateway) |
@@ -32,18 +32,21 @@ El menú **Admin** (crear producto) solo aparece cuando el usuario tiene el rol 
 
 ```
 pedidos360-hub/
-├── frontend/          # App web (Angular)
+├── frontend/             # App web (Angular)
 ├── backend/
-│   ├── orders/        # Microservicio de pedidos
-│   ├── products/      # Microservicio de catálogo
-│   └── rabbitmq-admin/ # Administrador de RabbitMQ
-├── infra/             # Configuración de infraestructura
-└── docs/              # Documentación técnica
+│   ├── common-messaging/ # Topología y utilidades compartidas (RabbitMQ/Kafka)
+│   ├── orders/           # Microservicio de pedidos
+│   ├── products/         # Microservicio de catálogo
+│   ├── rabbitmq-admin/   # Administrador de RabbitMQ
+│   ├── kafka-admin/      # Administrador de Kafka
+│   └── kafka-streams/    # Procesamiento de streams de Kafka
+├── infra/                # Configuración de infraestructura (RabbitMQ, Kafka)
+└── docs/                 # Documentación técnica
 ```
 
 ## Cómo ejecutar
 
-**Requisitos:** Java 21+, Node.js 20+ y Docker.
+**Requisitos:** Java 25+, Node.js 20+ y Docker.
 
 **Frontend** (Angular):
 
@@ -56,15 +59,22 @@ npm start        # ng serve con proxy /api (ver proxy.conf.json)
 **Backend** (un módulo por microservicio; por defecto usan el perfil `dev` con H2):
 
 ```bash
-cd backend/orders        # o backend/products, backend/rabbitmq-admin
+cd backend/orders        # o backend/products, backend/rabbitmq-admin, backend/kafka-admin
 ./gradlew bootRun        # en Windows: gradlew.bat bootRun
 ```
 
-**Infraestructura RabbitMQ** (clúster de 2 nodos + administración):
+**Infraestructura RabbitMQ** (clúster de 2 nodos):
 
 ```bash
 cd infra/rabbitmq
 cp .env.example .env     # ajusta las credenciales
+docker compose up -d
+```
+
+**Infraestructura Kafka** (3 brokers + Kafka UI):
+
+```bash
+cd infra/kafka
 docker compose up -d
 ```
 
